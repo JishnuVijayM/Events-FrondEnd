@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import LogoImg from '../../assets/Logo.png';
@@ -10,8 +10,8 @@ const Login = () => {
         email: '',
         password: '',
     };
-    const navigate = useNavigate()
 
+    const navigate = useNavigate();
 
     const validationSchema = Yup.object({
         email: Yup.string()
@@ -27,18 +27,20 @@ const Login = () => {
             setSubmitting(true);
             const response = await login(values);
 
+            console.log(response?.data);
+
             if (response?.status === 200) {
                 navigate('/admin');
             } else if (response?.status === 400) {
-                setErrors({ email: "Invalid input or missing fields" });
+                setErrors({ email: 'Invalid input or missing fields' });
             } else if (response?.status === 401) {
-                setErrors({ password: "Invalid credentials" });
+                setErrors({ password: 'Invalid credentials' });
             } else {
-                setErrors({ email: "Login failed. Please try again later." });
+                setErrors({ email: 'Login failed. Please try again later.' });
             }
         } catch (error) {
-            console.error("Login error:", error);
-            setErrors({ email: "An unexpected error occurred. Please try again later." });
+            console.error('Login error:', error);
+            setErrors({ email: 'An unexpected error occurred. Please try again later.' });
         } finally {
             setSubmitting(false);
         }
@@ -47,7 +49,7 @@ const Login = () => {
     return (
         <div className="flex justify-center items-center min-h-screen bg-cover bg-center w-full bg-black">
             <div className="w-full max-w-screen-xl h-auto lg:h-[34rem] bg-violet-300 shadow-lg flex flex-col lg:flex-row">
-
+                {/* Left Section */}
                 <div className="flex-1 bg-gradient-to-b from-white to-primary w-full h-full flex flex-col justify-around items-center p-6">
                     <img
                         src={LogoImg}
@@ -59,7 +61,6 @@ const Login = () => {
                         Create events, manage users, send notifications, and track reports—all in one place.
                         Log in to get started!
                     </p>
-
                     <div className="flex flex-col w-11/12 lg:w-2/3 mt-6 ps-3">
                         <p className="text-xs sm:text-sm text-black font-medium text-center lg:text-left">
                             Powered by: Softroniics
@@ -91,10 +92,9 @@ const Login = () => {
                                         name="email"
                                         type="email"
                                         placeholder="Email"
-                                        className={`shadow appearance-none pb-4 border-black rounded-full w-full py-2.5 px-3 bg-black text-white leading-tight focus:outline-none focus:shadow-outline ${errors.email && touched.email ? '' : 'mb-5'
-                                            }`}
-                                        aria-label="Email"
-                                        aria-required="true"
+                                        className={`shadow appearance-none pb-4 border-black rounded-full w-full py-2.5 px-3 bg-black text-white leading-tight focus:outline-none focus:shadow-outline ${
+                                            errors.email && touched.email ? '' : 'mb-5'
+                                        }`}
                                     />
                                     <ErrorMessage
                                         name="email"
@@ -108,8 +108,9 @@ const Login = () => {
                                         name="password"
                                         type="password"
                                         placeholder="Password"
-                                        className={`shadow appearance-none pb-4 border-black rounded-full w-full bg-black text-white py-2.5 px-3 leading-tight focus:outline-none focus:shadow-outline ${errors.password && touched.password ? '' : 'mb-4'
-                                            }`}
+                                        className={`shadow appearance-none pb-4 border-black rounded-full w-full bg-black text-white py-2.5 px-3 leading-tight focus:outline-none focus:shadow-outline ${
+                                            errors.password && touched.password ? '' : 'mb-4'
+                                        }`}
                                     />
                                     <ErrorMessage
                                         name="password"
@@ -119,12 +120,11 @@ const Login = () => {
                                 </div>
 
                                 <button
-                                    onClick={handleSubmit}
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="font-medium mt-14 w-full bg-orange text-white py-2.5 px-3 rounded-md hover:bg-orange-600 focus:outline-none focus:shadow-outline mb-1"
                                 >
-                                    Sign In
+                                    {isSubmitting ? 'Signing In...' : 'Sign In'}
                                 </button>
                                 <div className="w-11/12 sm:w-10/12 lg:w-2/3 flex flex-col">
                                     <div className="w-auto">
@@ -139,8 +139,6 @@ const Login = () => {
                             </Form>
                         )}
                     </Formik>
-
-
 
                     <Link
                         to="/forgot-password"
