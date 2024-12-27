@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import LogoImg from '../../assets/Logo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../service/api/auth';
 
 const Login = () => {
     const initialValues = {
         email: '',
         password: '',
     };
+    const navigate = useNavigate()
+
 
     const validationSchema = Yup.object({
         email: Yup.string()
@@ -19,14 +22,32 @@ const Login = () => {
             .required('Password is required'),
     });
 
-    const handleSubmit = (values) => {
-        console.log('Form Data:', values);
+    const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+        try {
+            setSubmitting(true);
+            const response = await login(values);
+
+            if (response?.status === 200) {
+                navigate('/admin');
+            } else if (response?.status === 400) {
+                setErrors({ email: "Invalid input or missing fields" });
+            } else if (response?.status === 401) {
+                setErrors({ password: "Invalid credentials" });
+            } else {
+                setErrors({ email: "Login failed. Please try again later." });
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            setErrors({ email: "An unexpected error occurred. Please try again later." });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-cover bg-center w-full bg-black">
             <div className="w-full max-w-screen-xl h-auto lg:h-[34rem] bg-violet-300 shadow-lg flex flex-col lg:flex-row">
-                {/* Left Section */}
+
                 <div className="flex-1 bg-gradient-to-b from-white to-primary w-full h-full flex flex-col justify-around items-center p-6">
                     <img
                         src={LogoImg}
@@ -98,6 +119,7 @@ const Login = () => {
                                 </div>
 
                                 <button
+                                    onClick={handleSubmit}
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="font-medium mt-14 w-full bg-orange text-white py-2.5 px-3 rounded-md hover:bg-orange-600 focus:outline-none focus:shadow-outline mb-1"
