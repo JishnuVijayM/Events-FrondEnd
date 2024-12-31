@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleDarkMode } from '../../redux/darkMode/darkModeSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoon, faSun, faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { Link, Route, Routes, useLocation } from 'react-router-dom'; // Use useLocation for current path
+import { faMoon, faSun, faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear } from '@fortawesome/free-solid-svg-icons';
+import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
@@ -21,10 +21,9 @@ const Index = () => {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('Dashboard');
     const [openSubMenu, setOpenSubMenu] = useState(null);
-    const location = useLocation(); // Access the current location (route)
+    const location = useLocation();
 
-    console.log(selectedMenu);
-
+    console.log(location);
 
     useEffect(() => {
         if (isDarkMode) {
@@ -138,7 +137,7 @@ const Index = () => {
                             </a>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <button
+                            {/* <button
                                 onClick={() => dispatch(toggleDarkMode())}
                                 className="px-4 py-2 text-sm font-medium text-gray-800 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none"
                             >
@@ -153,7 +152,7 @@ const Index = () => {
                                         Dark Mode
                                     </>
                                 )}
-                            </button>
+                            </button> */}
                             <button
                                 type="button"
                                 onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -166,6 +165,7 @@ const Index = () => {
                     </div>
                 </div>
             </nav>
+
 
             {/* Sidebar */}
             <aside
@@ -217,7 +217,7 @@ const Index = () => {
                                             >
                                                 <Link
                                                     to={subItem.href}
-                                                    onClick={() => handleMenu(subItem.name)} // Attach onClick here
+                                                    onClick={() => handleMenu(subItem.name)}
                                                     className="flex  items-center p-2 font-light rounded-lg group-hover:text-gray-800"
                                                 >
                                                     <span className="ms-3">{subItem.name}</span>
@@ -232,8 +232,9 @@ const Index = () => {
                 </div>
             </aside>
 
+
             {/* Main Content */}
-            <main className={`p-0 sm:ml-64 mt-16 bg-gray-100 text-gray-800`}>
+            <main className={`p-0 sm:ml-64 mt-16 md:mt-[73px] bg-gray-100 text-gray-800`}>
                 <Routes>
                     <Route index element={<Dashboard />} />
                     <Route path="dashboard" element={<Dashboard />} />

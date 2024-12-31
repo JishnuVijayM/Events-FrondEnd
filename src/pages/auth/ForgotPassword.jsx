@@ -1,48 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../service/api/auth';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
+import { forgotPassword } from '../../service/api/auth';
 
-function Login() {
-    const [showPassword, setShowPassword] = useState(false);
+
+function ForgotPassword() {
 
     const initialValues = {
         email: '',
-        password: '',
     };
-
-    const navigate = useNavigate();
 
     const validationSchema = Yup.object({
         email: Yup.string()
-            .email('Invalid email address')
-            .required('Email is required'),
-        password: Yup.string()
-            .min(4, 'Password must be at least 4 characters')
-            .required('Password is required'),
+            .email('Please enter a valid email address')
+            .required('Email is required')
+            .matches(
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                'Email must be a valid format (e.g., example@domain.com)'
+            ),
     });
+    
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
             setSubmitting(true);
-            const response = await login(values);
+            const response = await forgotPassword(values);
 
-            console.log(response);
-
+            console.log(response?.data);
 
             if (response?.status === 200) {
-                alert('Login successful!');
-
-                localStorage.setItem('token', response?.data?.token);
-
-                navigate('admin');
+                alert('mail send to email')
             } else if (response?.status === 400) {
                 setErrors({ email: 'Invalid input or missing fields' });
-            } else if (response?.status === 401) {
-                setErrors({ password: 'Invalid credentials' });
+            } else if (response?.status === 404) {
+                alert('User not found')
+                // setErrors({ password: 'Invalid credentials' });
+            } else if (response?.status === 451) {
+                alert('Mail not send')
             } else {
                 setErrors({ email: 'Login failed. Please try again later.' });
             }
@@ -57,10 +52,11 @@ function Login() {
     return (
         <div className="flex-1 bg-white w-full h-full flex items-center justify-between flex-col p-6">
             <div className="w-11/12 sm:w-10/12 lg:w-2/3 flex flex-col mt-8 sm:mt-14">
-                <p className="text-gray-800 font-semibold text-3xl sm:text-3xl">Welcome back!</p>
-                <p className="mt-2 text-start font-medium text-gray-900 text-sm sm:text-base">
-                    Please sign in to continue
+                <p className="text-gray-800 font-semibold text-3xl sm:text-3xl">Forgot Password!</p>
+                <p className="text-sm text-gray-600 mb-6 mt-2">
+                    Please provide your registered email address, and we will send you instructions to reset your password.
                 </p>
+
             </div>
 
             <Formik
@@ -85,43 +81,20 @@ function Login() {
                             />
                         </div>
 
-                        <div className="flex flex-col relative">
-                            <Field
-                                name="password"
-                                type={showPassword ? 'text' : 'password'}
-                                placeholder="Password"
-                                className={`shadow appearance-none pb-4 border-black rounded-full w-full bg-black text-white py-2.5 px-3 leading-tight focus:outline-none focus:shadow-outline ${errors.password && touched.password ? '' : 'mb-4'
-                                    }`}
-                            />
-                            <ErrorMessage
-                                name="password"
-                                component="div"
-                                className="text-red-500 text-xs mb-4 font-medium"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-3 text-white focus:outline-none"
-                            >
-                                <FontAwesomeIcon className='pb-1' icon={showPassword ? faEyeSlash : faEye} />
-                            </button>
-                        </div>
-
                         <button
                             type="submit"
                             disabled={isSubmitting}
                             className="font-medium mt-14 w-full bg-orange text-white py-2.5 px-3 rounded-md hover:bg-orange-600 focus:outline-none focus:shadow-outline mb-1"
                         >
-                            {isSubmitting ? 'Signing In...' : 'Sign In'}
+                            {isSubmitting ? 'Processing...' : 'Submit'}
                         </button>
                         <div className="w-11/12 sm:w-10/12 lg:w-2/3 flex flex-col">
                             <div className="w-auto">
                                 <Link
-                                    to="forgot-password"
-                                    // to="reset-password/344"
+                                    to="/"
                                     className="text-black hover:underline text-center text-xs sm:text-sm lg:text-left"
                                 >
-                                    Forgot Password?
+                                    Back to Login
                                 </Link>
                             </div>
                         </div>
@@ -130,13 +103,13 @@ function Login() {
             </Formik>
 
             <Link
-                to="forgot-password"
+                to="/forgot-password"
                 className="text-black text-center text-sm sm:text-md lg:text-left"
             >
                 Need help? Contact support.
             </Link>
         </div>
-    );
+    )
 }
 
-export default Login;
+export default ForgotPassword
