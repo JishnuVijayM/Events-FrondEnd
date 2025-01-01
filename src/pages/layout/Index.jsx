@@ -234,7 +234,7 @@ const Index = () => {
 
 
             {/* Main Content */}
-            <main className={`p-0 sm:ml-64 mt-16 md:mt-[73px] bg-gray-100 text-gray-800`}>
+            <main className={`p-0 sm:ml-64 mt-16 md:mt-[74px] bg-gray-100 text-gray-800`}>
                 <Routes>
                     <Route index element={<Dashboard />} />
                     <Route path="dashboard" element={<Dashboard />} />
