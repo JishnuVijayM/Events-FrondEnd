@@ -85,6 +85,22 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                     },
                 },
             }}
+            muiTableHeadCellFilterProps={{
+                sx: {
+                    '& .MuiInputBase-root': {
+                        backgroundColor: 'red', // Set the background color to red
+                        color: 'white', // Ensure the text color contrasts with the background
+                    },
+                    '& .MuiInputBase-input': {
+                        backgroundColor: 'red', // Set the background color for input fields
+                        color: 'white', // Ensure the text color contrasts with the background
+                    },
+                    '& .MuiSvgIcon-root': {
+                        color: 'white', // Set the icon color
+                    },
+                },
+            }}
+
             muiTableHeadProps={{
                 sx: {
                     '& .MuiTableCell-root': {
@@ -206,10 +222,13 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                             !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
                         }
                         onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-                        className='text-primary px-3 rounded-md hover:bg-zinc-700 disabled:text-gray-500 disabled:cursor-not-allowed'
+                        className={`text-primary px-3 rounded-md hover:bg-zinc-700 
+                         disabled:text-slate-400 disabled:bg-gray-200 
+                        disabled:cursor-not-allowed disabled:hover:bg-gray-200`}
                     >
                         <FileDownloadIcon /> EXPORT SELECTED ROWS
                     </button>
+
 
                 </Box>
             )}

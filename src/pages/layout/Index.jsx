@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
 import Login from '../auth/Login';
+import RoleManagement from '../administation/roleManagement/RoleManagement';
+
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -38,7 +40,7 @@ const Index = () => {
             id: 'dashboard',
             name: 'Dashboard',
             icon: faGaugeHigh,
-            href: '/admin/dashboard'
+            href: '/admin/'
         },
         {
             id: 'administration',
@@ -46,9 +48,9 @@ const Index = () => {
             icon: faUserLock,
             href: '#',
             subMenu: [
-                { id: 'authentication', name: 'Authentication', href: '/admin/dashboard' },
-                { id: 'role-management', name: 'Role Management', href: '/admin/dashboard' },
-                { id: 'user-management', name: 'User Management', href: '/home/user' }
+                { id: 'authentication', name: 'Authentication', href: '/admin/authentication' },
+                { id: 'role-management', name: 'Role Management', href: '/admin/role-management' },
+                { id: 'user-management', name: 'User Management', href: '/admin/user-management' }
             ]
         },
         {
@@ -236,8 +238,11 @@ const Index = () => {
             {/* Main Content */}
             <main className={`p-0 sm:ml-64 mt-16 md:mt-[74px] bg-gray-100 text-gray-800`}>
                 <Routes>
-                    <Route index element={<Dashboard />} />
-                    <Route path="dashboard" element={<Dashboard />} />
+                    {/* <Route index element={<Dashboard />} /> */}
+                    <Route path="/" element={<Dashboard />} />
+                    {/* <Route path="role-management" element={<RoleManagement />} />
+                    <Route path="user-management" element={<UserManagement />} />
+                    <Route path="authentication" element={<Authentication />} /> */}
                 </Routes>
             </main>
         </>

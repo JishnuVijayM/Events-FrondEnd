@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css';
 import Login from './pages/auth/Login';
 import Index from './pages/layout/Index';
-import Dashboard from './pages/dashboard/Index';
 import AuthLayout from './pages/auth/AuthLayout';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Resetpassword from './pages/auth/Resetpassword';
@@ -38,16 +37,13 @@ function App() {
 
         {/* Admin Routes */}
         <Route
-          // path="admin/*"
-          path='admin'
+          path="admin/*"
           element={
             <ProtectedRoute token={token}>
               <Index />
             </ProtectedRoute>
           }
-        >
-          <Route path="dashboard" element={<Dashboard />} />
-        </Route>
+        />
       </Routes>
     </Router>
   );
