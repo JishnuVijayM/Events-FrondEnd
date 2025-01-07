@@ -5,17 +5,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../service/api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch } from 'react-redux';
+import { handleAddPermissions, handleClearPermission, setRoleId } from '../../redux/rolePrevilages/permissionsSlice';
+import { getRole } from '../../service/api/api';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     const initialValues = {
         email: '',
         password: '',
     };
-
-
-    const navigate = useNavigate();
 
     const validationSchema = Yup.object({
         email: Yup.string()
@@ -28,18 +30,21 @@ function Login() {
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
+            dispatch(handleClearPermission())
             setSubmitting(true);
             const response = await login(values);
 
-            console.log(response);
-
-
             if (response?.status === 200) {
-                alert('Login successful!');
 
+                dispatch(setRoleId(response?.data?.role))
                 localStorage.setItem('token', response?.data?.token);
 
-                navigate('admin');
+                if (!response?.data?.role) {
+                    return
+                }
+
+                handleFetchPermission(response?.data?.role)
+
             } else if (response?.status === 400) {
                 setErrors({ email: 'Invalid input or missing fields' });
             } else if (response?.status === 401) {
@@ -54,6 +59,25 @@ function Login() {
             setSubmitting(false);
         }
     };
+
+    const handleFetchPermission = async (role) => {
+        if (!role) {
+            return
+        }
+
+        try {
+            const response = await getRole(role)
+
+            if (response.status === 200) {
+                alert('Login successful!');
+
+                dispatch(handleAddPermissions(response?.data.permissions))
+                navigate('admin');
+            }
+        } catch (error) {
+            console.log("permission error", error);
+        }
+    }
 
     return (
         <div className="flex-1 bg-white w-full h-full flex items-center justify-between flex-col p-6">

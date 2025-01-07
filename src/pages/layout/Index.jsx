@@ -1,14 +1,13 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { toggleDarkMode } from '../../redux/darkMode/darkModeSlice';
+import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoon, faSun, faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
-import Login from '../auth/Login';
 import RoleManagement from '../administation/roleManagement/RoleManagement';
-
+import UserManagement from '../administation/userManagement/UserManagement';
+import Authentication from '../administation/authentication/authentication';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -17,23 +16,16 @@ const Avatar = () => (
 );
 
 const Index = () => {
-    const dispatch = useDispatch();
-    const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
+    const { roleId, permissions } = useSelector((state) => state.adminPermissions);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('Dashboard');
     const [openSubMenu, setOpenSubMenu] = useState(null);
     const location = useLocation();
 
-    console.log(location);
+    console.log("rr", permissions);
 
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }, [isDarkMode]);
+
 
     const menuItems = [
         {
@@ -100,7 +92,7 @@ const Index = () => {
     };
 
     const handleLogout = () => {
-        // Add your logout logic here
+        alert('logout')
     };
 
     return (
@@ -139,22 +131,6 @@ const Index = () => {
                             </a>
                         </div>
                         <div className="flex items-center space-x-4">
-                            {/* <button
-                                onClick={() => dispatch(toggleDarkMode())}
-                                className="px-4 py-2 text-sm font-medium text-gray-800 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none"
-                            >
-                                {isDarkMode ? (
-                                    <>
-                                        <FontAwesomeIcon icon={faSun} className="me-2" />
-                                        Light Mode
-                                    </>
-                                ) : (
-                                    <>
-                                        <FontAwesomeIcon icon={faMoon} className="me-2" />
-                                        Dark Mode
-                                    </>
-                                )}
-                            </button> */}
                             <button
                                 type="button"
                                 onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -167,7 +143,6 @@ const Index = () => {
                     </div>
                 </div>
             </nav>
-
 
             {/* Sidebar */}
             <aside
@@ -187,7 +162,7 @@ const Index = () => {
                                             handleMenu(item.name);
                                         }
                                     }}
-                                    className={`group hover:bg-gray-200 rounded-lg ${selectedMenu === item.name ? ' text-primary' : 'text-white'}`}
+                                    className={`group hover:scale-80 hover:shadow-lg hover:opacity-90 transition-transform duration-300 rounded-lg ${selectedMenu === item.name ? ' text-primary' : 'text-white'}`}
                                 >
                                     <Link
                                         to={item.href}
@@ -199,28 +174,26 @@ const Index = () => {
                                         />
                                         <span className="ms-3">{item.name}</span>
                                         {item.subMenu && (
-                                            <span className="ml-auto text-white " >
+                                            <span className="ml-auto text-white">
                                                 <FontAwesomeIcon icon={faChevronRight}
-                                                    className={` transform transition-transform duration-300 ${openSubMenu === item.id ? 'rotate-90' : ''}`}
+                                                    className={`transform transition-transform duration-300 ${openSubMenu === item.id ? 'rotate-90' : ''}`}
                                                 />
                                             </span>
                                         )}
                                     </Link>
                                 </div>
 
-
                                 {item.subMenu && openSubMenu === item.id && (
                                     <ul className="pl-6 mt-2 space-y-2">
                                         {item.subMenu.map((subItem) => (
                                             <li
                                                 key={subItem.id}
-                                                className={`hover:bg-gray-200 rounded-lg ${selectedMenu === subItem.name ? 'bg-orange-500 text-primary' : 'text-white'
-                                                    }`}
+                                                className={`hover:scale-80 hover:shadow-lg hover:opacity-90 transition-transform duration-300 rounded-lg ${selectedMenu === subItem.name ? 'bg-orange-500 text-primary' : 'text-white'}`}
                                             >
                                                 <Link
                                                     to={subItem.href}
                                                     onClick={() => handleMenu(subItem.name)}
-                                                    className="flex  items-center p-2 font-light rounded-lg group-hover:text-gray-800"
+                                                    className="flex items-center p-2 font-light rounded-lg group-hover:text-gray-800"
                                                 >
                                                     <span className="ms-3">{subItem.name}</span>
                                                 </Link>
@@ -231,18 +204,28 @@ const Index = () => {
                             </li>
                         ))}
                     </ul>
+
+                    <ul className="mt-auto">
+                        <li className="hover:bg-gray-200 rounded-lg text-white">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center p-2 text-md font-medium rounded-lg group-hover:text-gray-500"
+                            >
+                                <FontAwesomeIcon icon={faSignOutAlt} className="w-5 h-5 text-primary" />
+                                <span className="ms-3">Logout</span>
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </aside>
-
 
             {/* Main Content */}
             <main className={`p-0 sm:ml-64 mt-16 md:mt-[74px] bg-gray-100 text-gray-800`}>
                 <Routes>
-                    {/* <Route index element={<Dashboard />} /> */}
                     <Route path="/" element={<Dashboard />} />
-                    {/* <Route path="role-management" element={<RoleManagement />} />
+                    <Route path="role-management" element={<RoleManagement />} />
                     <Route path="user-management" element={<UserManagement />} />
-                    <Route path="authentication" element={<Authentication />} /> */}
+                    <Route path="authentication" element={<Authentication />} />
                 </Routes>
             </main>
         </>

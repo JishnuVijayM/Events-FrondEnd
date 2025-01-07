@@ -2,11 +2,7 @@ import React from 'react'
 import Tab from '../../../components/Tab'
 import Table from '../../../components/Table';
 
-const RoleManagement = () => {
-    const tabs = [
-        { id: "list", label: "Role List" },
-        { id: "role", label: "New Role" },
-    ];
+const UserManagement = () => {
 
     const data = [
         { id: 1, name: 'John Doe', age: 28, city: 'New York', occupation: 'Engineer', salary: 70000 },
@@ -43,14 +39,19 @@ const RoleManagement = () => {
     const tabContent = {
         list: <Table data={data}
             columnHeaders={columnHeaders}
-            exportFileName="Role" />,
-        role: <p>New Role</p>,
+            exportFileName="User" />,
+        user: <p>New User</p>,
     };
+
+    const tabs = [
+        { id: "list", label: "User List" },
+        { id: "user", label: "New User" },
+    ];
     return (
         <div>
-            <Tab pageName="Role Management" tabs={tabs} tabContent={tabContent}/>
+            <Tab pageName="User Management" tabs={tabs} tabContent={tabContent} />
         </div>
     )
 }
 
-export default RoleManagement
+export default UserManagement
