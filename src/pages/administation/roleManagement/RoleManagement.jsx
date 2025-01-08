@@ -1,54 +1,81 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Tab from '../../../components/Tab'
-import Table from '../../../components/Table';
+import Table from '../../../components/Table'
+import { getAllRole } from '../../../service/api/api'
+import { useLocation } from 'react-router-dom'
+import Loader from '../../../components/Loader'
+import CreateRole from './CreateRole'
 
 const RoleManagement = () => {
+    const location = useLocation()
+    const [tableData, setTableData] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
+
+    const fetchRoles = async () => {
+        setIsLoading(true)
+        try {
+            const res = await getAllRole()
+
+            if (res?.data && Array.isArray(res?.data)) {
+                const formattedData = res?.data.map((role, index) => ({
+                    id: role._id,
+                    no: index + 1,
+                    'role-name': role.name,
+                    description: role.description,
+                    'updated-by': 'System',
+                    'last-updated': new Date(role.updatedAt).toLocaleString()
+                }))
+                setTableData(formattedData)
+            }
+        } catch (error) {
+            console.log("all role error", error)
+            setTableData([])
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        const pathname = location.pathname
+        const secondSegment = pathname.split('/')[2]
+
+        if (secondSegment === 'role-management') {
+            fetchRoles()
+        }
+    }, [location])
+
     const tabs = [
         { id: "list", label: "Role List" },
         { id: "role", label: "New Role" },
-    ];
-
-    const data = [
-        { id: 1, name: 'John Doe', age: 28, city: 'New York', occupation: 'Engineer', salary: 70000 },
-        { id: 2, name: 'Jane Smith', age: 32, city: 'Los Angeles', occupation: 'Designer', salary: 75000 },
-        { id: 3, name: 'Samuel Green', age: 25, city: 'Chicago', occupation: 'Teacher', salary: 50000 },
-        { id: 4, name: 'Emily Johnson', age: 30, city: 'Houston', occupation: 'Doctor', salary: 120000 },
-        { id: 5, name: 'Michael Brown', age: 35, city: 'Seattle', occupation: 'Architect', salary: 85000 },
-        { id: 6, name: 'Linda Davis', age: 29, city: 'Denver', occupation: 'Engineer', salary: 68000 },
-        { id: 7, name: 'Chris Wilson', age: 40, city: 'Miami', occupation: 'Manager', salary: 95000 },
-        { id: 8, name: 'Sarah Martinez', age: 26, city: 'Phoenix', occupation: 'Nurse', salary: 60000 },
-        { id: 9, name: 'David Clark', age: 33, city: 'Dallas', occupation: 'Chef', salary: 48000 },
-        { id: 10, name: 'Emma Lopez', age: 31, city: 'San Diego', occupation: 'Photographer', salary: 52000 },
-        { id: 11, name: 'Joshua Harris', age: 27, city: 'Boston', occupation: 'Writer', salary: 55000 },
-        { id: 12, name: 'Sophia Lewis', age: 36, city: 'Austin', occupation: 'Pilot', salary: 110000 },
-        { id: 13, name: 'Daniel Walker', age: 39, city: 'Portland', occupation: 'Actor', salary: 85000 },
-        { id: 14, name: 'Olivia Hall', age: 23, city: 'Atlanta', occupation: 'Dancer', salary: 45000 },
-        { id: 15, name: 'Matthew Young', age: 34, city: 'Orlando', occupation: 'Musician', salary: 57000 },
-        { id: 16, name: 'Isabella King', age: 24, city: 'Las Vegas', occupation: 'Artist', salary: 49000 },
-        { id: 17, name: 'Andrew Scott', age: 41, city: 'Nashville', occupation: 'Director', salary: 100000 },
-        { id: 18, name: 'Grace Wright', age: 22, city: 'San Antonio', occupation: 'Intern', salary: 35000 },
-        { id: 19, name: 'James Adams', age: 37, city: 'Salt Lake City', occupation: 'Lawyer', salary: 130000 },
-        { id: 20, name: 'Mia Perez', age: 38, city: 'Columbus', occupation: 'Scientist', salary: 125000 },
-    ];
+    ]
 
     const columnHeaders = [
-        { key: 'id', label: 'ID', size: 50 },
-        { key: 'name', label: 'Name', size: 150 },
-        { key: 'age', label: 'Age', size: 100 },
-        { key: 'city', label: 'City', size: 150 },
-        { key: 'occupation', label: 'Occupation', size: 150 },
-        { key: 'salary', label: 'Salary ($)', size: 150 },
-    ];
+        { key: 'no', label: 'NO', size: 50 },
+        { key: 'role-name', label: 'ROLE NAME', size: 100 },
+        { key: 'description', label: 'DESCRIPTION', size: 200 },
+        { key: 'updated-by', label: 'UPDATED BY', size: 150 },
+        { key: 'last-updated', label: 'LAST UPDATED', size: 150 },
+    ]
 
     const tabContent = {
-        list: <Table data={data}
-            columnHeaders={columnHeaders}
-            exportFileName="Role" />,
-        role: <p>New Role</p>,
-    };
+        list: (
+            <>
+                <Loader isLoading={isLoading}>
+                    <Table
+                        data={tableData}
+                        columnHeaders={columnHeaders}
+                        exportFileName="Role"
+                    />
+                </Loader>
+            </>
+
+        ),
+        role: <CreateRole/>,
+    }
+
     return (
         <div>
-            <Tab pageName="Role Management" tabs={tabs} tabContent={tabContent}/>
+            <Tab pageName="Role Management" tabs={tabs} tabContent={tabContent} />
         </div>
     )
 }

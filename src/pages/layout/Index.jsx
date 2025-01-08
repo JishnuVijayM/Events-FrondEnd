@@ -11,7 +11,7 @@ import Authentication from '../administation/authentication/authentication';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-        <span className="text-sm font-semibold text-gray-700">A</span>
+        <span className="text-sm font-semibold text-gray-700">Super Man</span>
     </div>
 );
 
@@ -23,47 +23,102 @@ const Index = () => {
     const [openSubMenu, setOpenSubMenu] = useState(null);
     const location = useLocation();
 
-    console.log("rr", permissions);
+    const hasPermission = (menuId, subModule = null) => {
+        if (!permissions || !permissions[0]) return false;
+        
+        const permissionGroup = permissions[0][menuId];
+        if (!permissionGroup) return false;
 
+        if (!subModule) {
+            // For main menu items, check if any submodule has read permission
+            return permissionGroup.some(module => module.read === true);
+        }
 
+        // For submenus, check specific module permission
+        const modulePermission = permissionGroup.find(module => 
+            module.module.toLowerCase() === subModule.toLowerCase()
+        );
+        return modulePermission?.read === true;
+    };
 
     const menuItems = [
         {
             id: 'dashboard',
             name: 'Dashboard',
             icon: faGaugeHigh,
-            href: '/admin/'
+            href: '/admin/',
+            permissionModule: 'dashboardManagement'
         },
         {
-            id: 'administration',
+            id: 'Administration',
             name: 'Administration',
             icon: faUserLock,
             href: '#',
             subMenu: [
-                { id: 'authentication', name: 'Authentication', href: '/admin/authentication' },
-                { id: 'role-management', name: 'Role Management', href: '/admin/role-management' },
-                { id: 'user-management', name: 'User Management', href: '/admin/user-management' }
+                { 
+                    id: 'authentication', 
+                    name: 'Authentication', 
+                    href: '/admin/authentication',
+                    permissionModule: 'authentication'
+                },
+                { 
+                    id: 'role-management', 
+                    name: 'Role Management', 
+                    href: '/admin/role-management',
+                    permissionModule: 'roleManagement'
+                },
+                { 
+                    id: 'user-management', 
+                    name: 'User Management', 
+                    href: '/admin/user-management',
+                    permissionModule: 'userManagement'
+                }
             ]
         },
         {
-            id: 'job-management',
+            id: 'jobManagement',
             name: 'Job Management',
             icon: faStopwatch,
             href: '#',
             subMenu: [
-                { id: 'company-management', name: 'Company Management', href: '/home/company' },
-                { id: 'job-openings', name: 'Job Openings', href: '/home/job-openings' },
-                { id: 'candidate-list', name: 'Candidate List', href: '/home/candidates' }
+                { 
+                    id: 'company-management', 
+                    name: 'Company Management', 
+                    href: '/home/company',
+                    permissionModule: 'companyManagement'
+                },
+                { 
+                    id: 'job-openings', 
+                    name: 'Job Openings', 
+                    href: '/home/job-openings',
+                    permissionModule: 'job'
+                },
+                { 
+                    id: 'candidate-list', 
+                    name: 'Candidate List', 
+                    href: '/home/candidates',
+                    permissionModule: 'candidateManagement'
+                }
             ]
         },
         {
-            id: 'event-management',
+            id: 'eventManagement',
             name: 'Event Management',
             icon: faCalendarCheck,
             href: '#',
             subMenu: [
-                { id: 'event', name: 'Event', href: '/home/event' },
-                { id: 'user-registration', name: 'User Registration', href: '/home/registration' }
+                { 
+                    id: 'event', 
+                    name: 'Event', 
+                    href: '/home/event',
+                    permissionModule: 'eventManagement'
+                },
+                { 
+                    id: 'user-registration', 
+                    name: 'User Registration', 
+                    href: '/home/registration',
+                    permissionModule: 'eventUserManagement'
+                }
             ]
         },
         {
@@ -72,16 +127,68 @@ const Index = () => {
             icon: faGear,
             href: '#',
             subMenu: [
-                { id: 'country', name: 'Country', href: '/home/country' },
-                { id: 'state', name: 'State', href: '/home/state' },
-                { id: 'district', name: 'District', href: '/home/district' },
-                { id: 'faq', name: 'FAQ', href: '/home/faq' },
-                { id: 'static-pages', name: 'Static Pages', href: '/home/static-pages' },
-                { id: 'notification', name: 'Notification', href: '/home/notification' },
-                { id: 'common-settings', name: 'Common Settings', href: '/home/common-settings' }
+                { 
+                    id: 'country', 
+                    name: 'Country', 
+                    href: '/home/country',
+                    permissionModule: 'countryManagement'
+                },
+                { 
+                    id: 'state', 
+                    name: 'State', 
+                    href: '/home/state',
+                    permissionModule: 'stateManagement'
+                },
+                { 
+                    id: 'district', 
+                    name: 'District', 
+                    href: '/home/district',
+                    permissionModule: 'districtManagement'
+                },
+                { 
+                    id: 'faq', 
+                    name: 'FAQ', 
+                    href: '/home/faq',
+                    permissionModule: 'faq'
+                },
+                { 
+                    id: 'static-pages', 
+                    name: 'Static Pages', 
+                    href: '/home/static-pages',
+                    permissionModule: 'staticPages'
+                },
+                { 
+                    id: 'notification', 
+                    name: 'Notification', 
+                    href: '/home/notification',
+                    permissionModule: 'notification'
+                },
+                { 
+                    id: 'common-settings', 
+                    name: 'Common Settings', 
+                    href: '/home/common-settings',
+                    permissionModule: 'commonSettings'
+                }
             ]
         }
     ];
+
+    const filteredMenuItems = menuItems.map(item => {
+        if (item.subMenu) {
+            const filteredSubMenu = item.subMenu.filter(subItem => 
+                hasPermission(item.id, subItem.permissionModule)
+            );
+            
+            // Only include main menu if it has visible submenu items
+            if (filteredSubMenu.length > 0) {
+                return { ...item, subMenu: filteredSubMenu };
+            }
+            return null;
+        }
+        
+        // For main menu items without submenu
+        return hasPermission(item.id, item.permissionModule) ? item : null;
+    }).filter(Boolean);
 
     const handleMenu = (itemName) => {
         setSelectedMenu(itemName);
@@ -92,7 +199,7 @@ const Index = () => {
     };
 
     const handleLogout = () => {
-        alert('logout')
+        alert('logout');
     };
 
     return (
@@ -122,13 +229,13 @@ const Index = () => {
                                     />
                                 </svg>
                             </button>
-                            <a href="/home/dashboard" className="flex ms-2">
+                            <Link to="/admin/" className="flex ms-2">
                                 <img
                                     src={LogoImg}
                                     alt="Logo"
                                     className="w-[60%] sm:w-[50%] lg:w-[70%] h-auto max-w-[280px] object-contain mb-0"
                                 />
-                            </a>
+                            </Link>
                         </div>
                         <div className="flex items-center space-x-4">
                             <button
@@ -152,7 +259,7 @@ const Index = () => {
             >
                 <div className="h-full px-3 pb-4 overflow-y-auto flex flex-col">
                     <ul className="mt-4 space-y-2 font-medium flex-1">
-                        {menuItems.map((item) => (
+                        {filteredMenuItems.map((item) => (
                             <li key={item.id}>
                                 <div
                                     onClick={() => {
@@ -175,7 +282,8 @@ const Index = () => {
                                         <span className="ms-3">{item.name}</span>
                                         {item.subMenu && (
                                             <span className="ml-auto text-white">
-                                                <FontAwesomeIcon icon={faChevronRight}
+                                                <FontAwesomeIcon 
+                                                    icon={faChevronRight}
                                                     className={`transform transition-transform duration-300 ${openSubMenu === item.id ? 'rotate-90' : ''}`}
                                                 />
                                             </span>

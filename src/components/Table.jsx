@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
-    const [tableData, setTableData] = useState(data);
+    const [tableData, setTableData] = useState([]);
+
+    useEffect(() => {
+        if (Array.isArray(data)) {
+            setTableData(data);
+        }
+    }, [data]);
 
     const columns = [
         ...columnHeaders.map((header) => ({
@@ -21,17 +26,9 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             header: 'Actions',
             size: 100,
             Cell: ({ row }) => (
-                // <Button
-                //     variant="outlined"
-                //     color="error"
-                //     startIcon={<DeleteIcon />}
-                //     onClick={() => handleDeleteRow(row.original.id)}
-                //     sx={{ whiteSpace: 'nowrap' }}
-                // >
-                //     Delete
-                // </Button>
                 <>
-                    <button className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
+                    <button onClick={()=> alert(row.original.id)} 
+                    className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
                         <FontAwesomeIcon icon={faEye} />
                     </button>
                     <button className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
@@ -51,11 +48,6 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         useKeysAsHeaders: true,
         filename: exportFileName,
     });
-
-    const handleDeleteRow = (id) => {
-        const updatedData = tableData.filter((row) => row.id !== id);
-        setTableData(updatedData);
-    };
 
     const handleExportRows = (rows) => {
         const rowData = rows.map((row) => row.original);
@@ -77,6 +69,12 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             enablePagination
             enableBottomToolbar
             enableTopToolbar
+            muiTableContainerProps={{
+                sx: {
+                    minHeight: '380px', // Set minimum height here
+                    backgroundColor: '#403e3e',
+                },
+            }}
             muiTableProps={{
                 sx: {
                     backgroundColor: '#403e3e',
@@ -88,19 +86,18 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             muiTableHeadCellFilterProps={{
                 sx: {
                     '& .MuiInputBase-root': {
-                        backgroundColor: 'red', // Set the background color to red
-                        color: 'white', // Ensure the text color contrasts with the background
+                        backgroundColor: 'red',
+                        color: 'white',
                     },
                     '& .MuiInputBase-input': {
-                        backgroundColor: 'red', // Set the background color for input fields
-                        color: 'white', // Ensure the text color contrasts with the background
+                        backgroundColor: 'red',
+                        color: 'white',
                     },
                     '& .MuiSvgIcon-root': {
-                        color: 'white', // Set the icon color
+                        color: 'white',
                     },
                 },
             }}
-
             muiTableHeadProps={{
                 sx: {
                     '& .MuiTableCell-root': {
@@ -183,7 +180,6 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                     '& .MuiInputLabel-root': {
                         color: 'white',
                         backgroundColor: 'red'
-
                     },
                     '& .MuiSvgIcon-root': {
                         color: 'white'
@@ -199,8 +195,6 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                         flexWrap: 'wrap',
                     }}
                 >
-
-                    {/* export all data that is currently in the table (ignore pagination, sorting, filtering, etc.) */}
                     <button
                         onClick={handleExportData}
                         className='text-primary px-3 rounded-md hover:bg-zinc-700'
@@ -216,7 +210,6 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                         <FileDownloadIcon /> EXPORT PAGE ROWS
                     </button>
 
-                    {/* //only export selected rows */}
                     <button
                         disabled={
                             !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
@@ -228,8 +221,6 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                     >
                         <FileDownloadIcon /> EXPORT SELECTED ROWS
                     </button>
-
-
                 </Box>
             )}
         />
