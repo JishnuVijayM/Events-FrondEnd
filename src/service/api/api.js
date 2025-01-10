@@ -17,3 +17,12 @@ export const getAllRole = async () => {
         return error
     }
 }
+
+export const createRole = async (data) => {
+    try {
+        const res = await axiosInstance.post(`/admin/createRole`,data)
+        return res
+    } catch (error) {
+        return error
+    }
+}

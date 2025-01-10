@@ -1,13 +1,15 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
 import RoleManagement from '../administation/roleManagement/RoleManagement';
 import UserManagement from '../administation/userManagement/UserManagement';
 import Authentication from '../administation/authentication/authentication';
+import { getRole } from '../../service/api/api';
+import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlice';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -22,10 +24,47 @@ const Index = () => {
     const [selectedMenu, setSelectedMenu] = useState('Dashboard');
     const [openSubMenu, setOpenSubMenu] = useState(null);
     const location = useLocation();
+    const dispatch = useDispatch()
+
+    console.log("permission in layout",permissions);
+    
+
+    console.log("per", permissions);
+    console.log("iddd :", roleId);
+
+    const handleFetchPermission = async () => {
+
+        const roleId = localStorage.getItem('id')
+
+        console.log("layout", roleId);
+
+        if (!roleId) {
+            alert('session expired, login again')
+            return
+        }
+
+        try {
+            const response = await getRole(roleId)
+
+            if (response.status === 200) {
+                dispatch(handleAddPermissions(response?.data.permissions))
+            } else {
+                alert('session expired, login again')
+            }   
+        } catch (error) {
+            console.log("permission error", error);
+        }
+    }
+
+    useEffect(() => {
+        handleFetchPermission()
+    }, [])
+
+
 
     const hasPermission = (menuId, subModule = null) => {
         if (!permissions || !permissions[0]) return false;
-        
+
         const permissionGroup = permissions[0][menuId];
         if (!permissionGroup) return false;
 
@@ -35,7 +74,7 @@ const Index = () => {
         }
 
         // For submenus, check specific module permission
-        const modulePermission = permissionGroup.find(module => 
+        const modulePermission = permissionGroup.find(module =>
             module.module.toLowerCase() === subModule.toLowerCase()
         );
         return modulePermission?.read === true;
@@ -50,26 +89,26 @@ const Index = () => {
             permissionModule: 'dashboardManagement'
         },
         {
-            id: 'Administration',
+            id: 'administration',
             name: 'Administration',
             icon: faUserLock,
             href: '#',
             subMenu: [
-                { 
-                    id: 'authentication', 
-                    name: 'Authentication', 
+                {
+                    id: 'authentication',
+                    name: 'Authentication',
                     href: '/admin/authentication',
                     permissionModule: 'authentication'
                 },
-                { 
-                    id: 'role-management', 
-                    name: 'Role Management', 
+                {
+                    id: 'role-management',
+                    name: 'Role Management',
                     href: '/admin/role-management',
                     permissionModule: 'roleManagement'
                 },
-                { 
-                    id: 'user-management', 
-                    name: 'User Management', 
+                {
+                    id: 'user-management',
+                    name: 'User Management',
                     href: '/admin/user-management',
                     permissionModule: 'userManagement'
                 }
@@ -81,21 +120,21 @@ const Index = () => {
             icon: faStopwatch,
             href: '#',
             subMenu: [
-                { 
-                    id: 'company-management', 
-                    name: 'Company Management', 
+                {
+                    id: 'company-management',
+                    name: 'Company Management',
                     href: '/home/company',
                     permissionModule: 'companyManagement'
                 },
-                { 
-                    id: 'job-openings', 
-                    name: 'Job Openings', 
+                {
+                    id: 'job-openings',
+                    name: 'Job Openings',
                     href: '/home/job-openings',
                     permissionModule: 'job'
                 },
-                { 
-                    id: 'candidate-list', 
-                    name: 'Candidate List', 
+                {
+                    id: 'candidate-list',
+                    name: 'Candidate List',
                     href: '/home/candidates',
                     permissionModule: 'candidateManagement'
                 }
@@ -107,15 +146,15 @@ const Index = () => {
             icon: faCalendarCheck,
             href: '#',
             subMenu: [
-                { 
-                    id: 'event', 
-                    name: 'Event', 
+                {
+                    id: 'event',
+                    name: 'Event',
                     href: '/home/event',
                     permissionModule: 'eventManagement'
                 },
-                { 
-                    id: 'user-registration', 
-                    name: 'User Registration', 
+                {
+                    id: 'user-registration',
+                    name: 'User Registration',
                     href: '/home/registration',
                     permissionModule: 'eventUserManagement'
                 }
@@ -127,45 +166,45 @@ const Index = () => {
             icon: faGear,
             href: '#',
             subMenu: [
-                { 
-                    id: 'country', 
-                    name: 'Country', 
+                {
+                    id: 'country',
+                    name: 'Country',
                     href: '/home/country',
                     permissionModule: 'countryManagement'
                 },
-                { 
-                    id: 'state', 
-                    name: 'State', 
+                {
+                    id: 'state',
+                    name: 'State',
                     href: '/home/state',
                     permissionModule: 'stateManagement'
                 },
-                { 
-                    id: 'district', 
-                    name: 'District', 
+                {
+                    id: 'district',
+                    name: 'District',
                     href: '/home/district',
                     permissionModule: 'districtManagement'
                 },
-                { 
-                    id: 'faq', 
-                    name: 'FAQ', 
+                {
+                    id: 'faq',
+                    name: 'FAQ',
                     href: '/home/faq',
                     permissionModule: 'faq'
                 },
-                { 
-                    id: 'static-pages', 
-                    name: 'Static Pages', 
+                {
+                    id: 'static-pages',
+                    name: 'Static Pages',
                     href: '/home/static-pages',
                     permissionModule: 'staticPages'
                 },
-                { 
-                    id: 'notification', 
-                    name: 'Notification', 
+                {
+                    id: 'notification',
+                    name: 'Notification',
                     href: '/home/notification',
                     permissionModule: 'notification'
                 },
-                { 
-                    id: 'common-settings', 
-                    name: 'Common Settings', 
+                {
+                    id: 'common-settings',
+                    name: 'Common Settings',
                     href: '/home/common-settings',
                     permissionModule: 'commonSettings'
                 }
@@ -175,17 +214,17 @@ const Index = () => {
 
     const filteredMenuItems = menuItems.map(item => {
         if (item.subMenu) {
-            const filteredSubMenu = item.subMenu.filter(subItem => 
+            const filteredSubMenu = item.subMenu.filter(subItem =>
                 hasPermission(item.id, subItem.permissionModule)
             );
-            
+
             // Only include main menu if it has visible submenu items
             if (filteredSubMenu.length > 0) {
                 return { ...item, subMenu: filteredSubMenu };
             }
             return null;
         }
-        
+
         // For main menu items without submenu
         return hasPermission(item.id, item.permissionModule) ? item : null;
     }).filter(Boolean);
@@ -282,7 +321,7 @@ const Index = () => {
                                         <span className="ms-3">{item.name}</span>
                                         {item.subMenu && (
                                             <span className="ml-auto text-white">
-                                                <FontAwesomeIcon 
+                                                <FontAwesomeIcon
                                                     icon={faChevronRight}
                                                     className={`transform transition-transform duration-300 ${openSubMenu === item.id ? 'rotate-90' : ''}`}
                                                 />

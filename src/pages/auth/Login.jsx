@@ -29,15 +29,18 @@ function Login() {
     });
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+
+        localStorage.clear();
+
         try {
             dispatch(handleClearPermission())
             setSubmitting(true);
             const response = await login(values);
 
             if (response?.status === 200) {
-
                 dispatch(setRoleId(response?.data?.role))
                 localStorage.setItem('token', response?.data?.token);
+                localStorage.setItem('id', response?.data?.role);
 
                 if (!response?.data?.role) {
                     return
@@ -68,11 +71,14 @@ function Login() {
         try {
             const response = await getRole(role)
 
+            console.log("res per",response.data.permissions);
+            
+
             if (response.status === 200) {
                 alert('Login successful!');
-
-                dispatch(handleAddPermissions(response?.data.permissions))
                 navigate('admin');
+                dispatch(handleAddPermissions(response?.data.permissions))
+                
             }
         } catch (error) {
             console.log("permission error", error);
