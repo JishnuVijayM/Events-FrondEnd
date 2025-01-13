@@ -16,7 +16,6 @@ const permissionsSlice = createSlice({
             state.roleId = ""
         },
         handleAddPermissions: (state, action) => {
-            // state.permissions.push(action.payload)
             state.permissions = [action.payload]
         },
         handleClearPermission: (state) => {

@@ -5,15 +5,24 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useDispatch } from 'react-redux';
+import { setActiveTab } from '../redux/tabContents/tabSlice';
 
 const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
     const [tableData, setTableData] = useState([]);
+    const dispatch = useDispatch()
+
 
     useEffect(() => {
         if (Array.isArray(data)) {
             setTableData(data);
         }
     }, [data]);
+
+    const handleView = (e) => {
+        alert(e)
+        dispatch(setActiveTab("add"))
+    }
 
     const columns = [
         ...columnHeaders.map((header) => ({
@@ -27,8 +36,8 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             size: 100,
             Cell: ({ row }) => (
                 <>
-                    <button onClick={()=> alert(row.original.id)} 
-                    className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
+                    <button onClick={() => handleView(row.original.id)}
+                        className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
                         <FontAwesomeIcon icon={faEye} />
                     </button>
                     <button className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>

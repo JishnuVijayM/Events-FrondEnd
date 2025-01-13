@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { createRole } from '../../../service/api/api';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 
 const initialPermissions = {
     dashboard: [
@@ -33,8 +34,7 @@ function CreateRole() {
     const [permissions, setPermissions] = useState(initialPermissions);
     const [roleName, setRoleName] = useState('');
     const [description, setDescription] = useState('');
-    const navigate = useNavigate();
-
+    const dispatch = useDispatch()
 
     const handleCheckboxChange = (category, moduleIndex, permission) => {
         setPermissions(prevPermissions => {
@@ -106,47 +106,45 @@ function CreateRole() {
 
         try {
 
-            if(!roleName || !description){
+            if (!roleName || !description) {
                 alert('must have value')
                 return
             }
-    
-            if(roleName.length < 3 ){
+
+            if (roleName.length < 3) {
                 alert('enter valid role name , min 3 ')
                 return
             }
-        
+
             const formData = {
-                name:  roleName,
+                name: roleName,
                 description,
                 permissions
             };
 
             const response = await createRole(formData)
 
-            console.log("create role res",response);
-            
+            console.log("create role res", response);
 
-            if(response.status === 201){
+
+            if (response.status === 201) {
                 alert('role created succesfully')
-                navigate('/admin/role-management');
+                dispatch(setActiveTab("list"))
                 return
             }
 
-            if(response.status === 400){
+            if (response.status === 400) {
                 alert('Role with this name already exists')
                 return
             }
-            
+
         } catch (error) {
             alert('api failed ')
         }
 
     };
 
-    const demo = ()=>{
-        navigate('/admin/');
-    }
+
 
 
     return (
@@ -170,7 +168,8 @@ function CreateRole() {
                     />
                 </div>
 
-                <Button onClick={demo} className='mt-7' />
+
+                <Button onClick={handleSubmit} className='mt-7' />
             </div>
 
             <div className="mt-8 flex flex-col gap-4">

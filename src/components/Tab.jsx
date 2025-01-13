@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveTab } from "../redux/tabContents/tabSlice";
 
 const Tab = ({pageName,tabs,tabContent}) => {
-    const [activeTab, setActiveTab] = useState("list");
+    const { activeTab } = useSelector((state) => state.tabContent);
+    const dispatch = useDispatch()
 
     return (
         <div className="w-full mx-auto bg-black  p-2">
@@ -23,7 +26,7 @@ const Tab = ({pageName,tabs,tabContent}) => {
                                     ? "text-white bg-black ring-1 ring-white "
                                     : "ring-1 ring-white bg-gray text-gray-600"
                                     }`}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => dispatch(setActiveTab(tab.id))}
                                 type="button"
                                 role="tab"
                                 aria-controls={tab.id}
