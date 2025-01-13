@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Tab from '../../../components/Tab';
 import Table from '../../../components/Table';
 import Loader from '../../../components/Loader';
 import CreateRole from './CreateRole';
 import { getAllRole } from '../../../service/api/api';
+import { clearEditedItem, clearViewedItem } from '../../../redux/tabContents/tabSlice';
 
 const RoleManagement = () => {
     const location = useLocation();
@@ -13,6 +14,8 @@ const RoleManagement = () => {
     const [tableData, setTableData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { activeTab } = useSelector((state) => state.tabContent);
+    const dispatch = useDispatch()
+
 
     const fetchRoles = useCallback(async () => {
         if (pathname.split('/')[2] !== 'role-management') return;

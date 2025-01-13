@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
-import { createRole } from '../../../service/api/api';
-import { useDispatch } from 'react-redux';
+import { createRole, getRole } from '../../../service/api/api';
+import { useDispatch, useSelector } from 'react-redux';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
+import Loader from '../../../components/Loader';
 
 const initialPermissions = {
     dashboard: [
@@ -35,6 +36,40 @@ function CreateRole() {
     const [roleName, setRoleName] = useState('');
     const [description, setDescription] = useState('');
     const dispatch = useDispatch()
+    const [isLoading, setIsLoading] = useState(false);
+    const { editItem, viewItem } = useSelector((state) => state.tabContent);
+
+    console.log("edt", editItem);
+    console.log("viw", viewItem);
+
+
+    //get Role
+    const getRoleData = async () => {
+        setIsLoading(true);
+        try {
+            const response = await getRole(viewItem?.id);
+            console.log("get role res", response);
+
+            if (response.status === 200) {
+                setRoleName(response.data.name || '');
+                setDescription(response.data.description || '');
+                setPermissions(response.data.permissions || initialPermissions);
+            }
+        } catch (error) {
+            alert('error fetching role');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (viewItem?.isView || viewItem?.isEdit) {
+            getRoleData();
+        }
+    }, [viewItem]);
+
+
+
 
     const handleCheckboxChange = (category, moduleIndex, permission) => {
         setPermissions(prevPermissions => {
@@ -79,10 +114,9 @@ function CreateRole() {
                                 type="checkbox"
                                 checked={module[permission]}
                                 onChange={() => handleCheckboxChange(category, moduleIndex, permission)}
-                                className="mr-2 h-4 w-4 bg-black border-white outline-none focus:ring-0"
-                                disabled={permission !== 'read' && !module.read}
+                                className="mr-2 h-4 w-4 bg-black border-white outline-none focus:ring-0 disabled:cursor-not-allowed"
+                                disabled={viewItem.isView || (permission !== 'read' && !module.read)}
                             />
-
                             {permission.charAt(0).toUpperCase() + permission.slice(1)}
                         </label>
                     )
@@ -103,6 +137,10 @@ function CreateRole() {
 
 
     const handleSubmit = async () => {
+
+        // console.log("per",permissions);
+        // return
+
 
         try {
 
@@ -149,43 +187,50 @@ function CreateRole() {
 
     return (
         <div className="w-full h-auto rounded-md bg-gray p-5">
-            <div className="flex justify-center items-start gap-5">
-                <div className="w-1/2">
-                    <TextInput
-                        onChange={(e) => setRoleName(e.value)}
-                        label={'Role Name'}
-                        placeholder={'Enter Role Name'}
-                        width="w-full"
-                    />
-                </div>
-
-                <div className="w-1/2">
-                    <TextInput
-                        onChange={(e) => setDescription(e.value)}
-                        label={'Description'}
-                        placeholder={'Enter Description'}
-                        width="w-full"
-                    />
-                </div>
-
-
-                <Button onClick={handleSubmit} className='mt-7' />
-            </div>
-
-            <div className="mt-8 flex flex-col gap-4">
-                {[...Array(rows)].map((_, rowIndex) => (
-                    <div key={rowIndex} className="flex gap-4 justify-start">
-                        {allModules.slice(rowIndex * 4, (rowIndex + 1) * 4).map((item, index) => (
-                            <PermissionModule
-                                key={`${item.category}-${item.moduleIndex}`}
-                                module={item.module}
-                                category={item.category}
-                                moduleIndex={item.moduleIndex}
-                            />
-                        ))}
+            <Loader isLoading={isLoading}>
+                <div className="flex justify-center items-start gap-5">
+                    <div className="w-1/2">
+                        <TextInput
+                            disabled={viewItem.isView}
+                            value={roleName}
+                            onChange={(e) => setRoleName(e.value)}
+                            label={'Role Name'}
+                            placeholder={'Enter Role Name'}
+                            width="w-full"
+                        />
                     </div>
-                ))}
-            </div>
+
+                    <div className="w-1/2">
+                        <TextInput
+                            disabled={viewItem.isView}
+                            value={description}
+                            onChange={(e) => setDescription(e.value)}
+                            label={'Description'}
+                            placeholder={'Enter Description'}
+                            width="w-full"
+                        />
+                    </div>
+
+
+                    <Button disabled={viewItem.isView}
+                        onClick={handleSubmit} className='mt-7' />
+                </div>
+
+                <div className="mt-8 flex flex-col gap-4">
+                    {[...Array(rows)].map((_, rowIndex) => (
+                        <div key={rowIndex} className="flex gap-4 justify-start">
+                            {allModules.slice(rowIndex * 4, (rowIndex + 1) * 4).map((item, index) => (
+                                <PermissionModule
+                                    key={`${item.category}-${item.moduleIndex}`}
+                                    module={item.module}
+                                    category={item.category}
+                                    moduleIndex={item.moduleIndex}
+                                />
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </Loader>
         </div>
     );
 }

@@ -1,10 +1,11 @@
 import React from 'react'
 
-function Button({ onClick, label, className }) {
+function Button({ onClick, label, className, disabled }) {
     return (
         <button
+            disabled={disabled}
             onClick={onClick}
-            className={`${className} cursor-pointer bg-gradient-to-b from-primary to-amber-400 text-black h-10 w-20 px-3 rounded-md`}
+            className={`${className} cursor-pointer bg-gradient-to-b from-primary to-amber-400 text-black h-10 w-20 px-3 rounded-md disabled:cursor-not-allowed disabled:bg-red-300 disabled:text-slate-800`}
         >
             {label ? label : "Save"}
         </button>

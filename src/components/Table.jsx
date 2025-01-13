@@ -6,7 +6,7 @@ import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch } from 'react-redux';
-import { setActiveTab } from '../redux/tabContents/tabSlice';
+import { clearEditedItem, clearViewedItem, setActiveTab, setViewedItem } from '../redux/tabContents/tabSlice';
 
 const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
     const [tableData, setTableData] = useState([]);
@@ -14,13 +14,18 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
 
 
     useEffect(() => {
+
+        dispatch(clearViewedItem())
+        dispatch(clearEditedItem())
+
+
         if (Array.isArray(data)) {
             setTableData(data);
         }
     }, [data]);
 
-    const handleView = (e) => {
-        alert(e)
+    const handleView = (id) => {
+        dispatch(setViewedItem(id));
         dispatch(setActiveTab("add"))
     }
 
