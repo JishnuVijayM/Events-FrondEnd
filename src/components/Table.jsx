@@ -7,14 +7,17 @@ import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch } from 'react-redux';
 import { clearEditedItem, clearViewedItem, setActiveTab, setViewedItem } from '../redux/tabContents/tabSlice';
+import { useLocation } from 'react-router-dom';
+import { deleteApi } from '../service/api/api';
+import { Error, Success } from './Notification';
 
 const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
     const [tableData, setTableData] = useState([]);
     const dispatch = useDispatch()
-
+    const location = useLocation();
+    const { pathname } = location;
 
     useEffect(() => {
-
         dispatch(clearViewedItem())
         dispatch(clearEditedItem())
 
@@ -28,6 +31,41 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         dispatch(setViewedItem(id));
         dispatch(setActiveTab("add"))
     }
+
+    const handleDelete = async (id) => {
+        const currentPage = pathname.split('/')[2];
+        const endpoints = {
+            'role-management': `/admin/deleteRole/${id}`,
+            company: `/api/companies/${id}`,
+            role: `/api/roles/${id}`
+        };
+    
+        const endpoint = endpoints[currentPage];
+        
+        try {
+            const response = await deleteApi(endpoint);
+            if (response.status === 200) {
+                setTableData(prevData => prevData.filter(item => item.id !== id));
+                Success('Item successfully deleted');
+            }
+        } catch (error) {
+            console.error('Delete operation failed:', error);
+            
+            switch (error.response?.status) {
+                case 400:
+                    Error('ID not found. Please check and try again.');
+                    break;
+                case 404:
+                    Error('No roles found with this ID.');
+                    break;
+                case 500:
+                    Error('Server error occurred. Please try again later.');
+                    break;
+                default:
+                    Error('Failed to delete item. Please try again.');
+            }
+        }
+    };
 
     const columns = [
         ...columnHeaders.map((header) => ({
@@ -45,10 +83,12 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                         className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
                         <FontAwesomeIcon icon={faEye} />
                     </button>
-                    <button className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
+                    <button
+                        className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
                         <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
-                    <button className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
+                    <button onClick={() => handleDelete(row.original.id)}
+                        className='hover:bg-primary box-border h-8 w-8 rounded-md mx-2'>
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
                 </>

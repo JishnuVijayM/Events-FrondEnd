@@ -6,6 +6,7 @@ import Index from './pages/layout/Index';
 import AuthLayout from './pages/auth/AuthLayout';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Resetpassword from './pages/auth/Resetpassword';
+import { Toaster } from 'react-hot-toast';
 
 const ProtectedRoute = ({ token, children }) => {
   return token ? children : <Navigate to="/" replace />;
@@ -28,6 +29,8 @@ function App() {
 
   return (
     <Router>
+      <Toaster />
+
       <Routes>
         <Route path="/" element={<AuthLayout />}>
           <Route index element={<Login />} />

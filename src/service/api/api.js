@@ -26,3 +26,12 @@ export const createRole = async (data) => {
         return error
     }
 }
+
+export const deleteApi = async (url) => {
+    try {
+        const res = await axiosInstance.delete(url)
+        return res;
+    } catch (error) {
+        return error
+    }
+}

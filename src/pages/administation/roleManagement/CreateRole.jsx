@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { createRole, getRole } from '../../../service/api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 import Loader from '../../../components/Loader';
+import { Error, Success, Warning } from '../../../components/Notification';
 
 const initialPermissions = {
     dashboard: [
@@ -35,46 +36,51 @@ function CreateRole() {
     const [permissions, setPermissions] = useState(initialPermissions);
     const [roleName, setRoleName] = useState('');
     const [description, setDescription] = useState('');
-    const dispatch = useDispatch()
     const [isLoading, setIsLoading] = useState(false);
-    const { editItem, viewItem } = useSelector((state) => state.tabContent);
+    const dispatch = useDispatch();
+    const { viewItem } = useSelector((state) => state.tabContent);
 
-    console.log("edt", editItem);
-    console.log("viw", viewItem);
+    const getRoleData = useCallback(async () => {
+        if (!viewItem?.id) {
+            Warning('Role ID is required');
+            return;
+        }
 
-
-    //get Role
-    const getRoleData = async () => {
         setIsLoading(true);
         try {
-            const response = await getRole(viewItem?.id);
-            console.log("get role res", response);
-
+            const response = await getRole(viewItem.id);
+            
             if (response.status === 200) {
-                setRoleName(response.data.name || '');
-                setDescription(response.data.description || '');
-                setPermissions(response.data.permissions || initialPermissions);
+                setRoleName(response.data?.name || '');
+                setDescription(response.data?.description || '');
+                setPermissions(response.data?.permissions || initialPermissions);
+            } else {
+                const errorMessages = {
+                    400: 'Invalid role ID',
+                    404: 'An error occurred',
+                    500: 'Server error occurred'
+                };
+                dispatch(setActiveTab("list"));
+                Error(response.data?.message || errorMessages[response.status] || 'Unexpected error occurred');
             }
         } catch (error) {
-            alert('error fetching role');
+            dispatch(setActiveTab("list"));
+            Error(error.message || 'Failed to fetch role details');
+            console.error('Error fetching role:', error);
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [viewItem?.id]);
 
     useEffect(() => {
-        if (viewItem?.isView || viewItem?.isEdit) {
+        if (viewItem?.id && (viewItem?.isView || viewItem?.isEdit)) {
             getRoleData();
         }
-    }, [viewItem]);
+    }, [getRoleData, viewItem?.id, viewItem?.isView, viewItem?.isEdit]);
 
-
-
-
-    const handleCheckboxChange = (category, moduleIndex, permission) => {
+    const handleCheckboxChange = useCallback((category, moduleIndex, permission) => {
         setPermissions(prevPermissions => {
             const updatedPermissions = JSON.parse(JSON.stringify(prevPermissions));
-
             updatedPermissions[category][moduleIndex][permission] =
                 !updatedPermissions[category][moduleIndex][permission];
 
@@ -94,18 +100,50 @@ function CreateRole() {
 
             return updatedPermissions;
         });
-    };
+    }, []);
 
-    function formatModuleName(moduleName) {
-        return moduleName
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, str => str.toUpperCase())
-            .trim();
-    }
+    const handleSubmit = useCallback(async () => {
+        if (!roleName?.trim() || !description?.trim()) {
+            Warning('All fields are required');
+            return;
+        }
 
-    const PermissionModule = ({ module, category, moduleIndex }) => (
+        if (roleName.trim().length < 3) {
+            Warning('Role name must be at least 3 characters long');
+            return;
+        }
+
+        try {
+            const formData = {
+                name: roleName.trim(),
+                description: description.trim(),
+                permissions
+            };
+
+            const response = await createRole(formData);
+            
+            if (response.status === 201) {
+                Success('Role created successfully');
+                dispatch(setActiveTab("list"));
+            } else {
+                const errorMessages = {
+                    400: 'Role already exists',
+                    404: 'Resource not found',
+                    500: 'An internal server error occurred'
+                };
+                Error(response.data?.message || errorMessages[response.status] || 'Unexpected error occurred');
+            }
+        } catch (error) {
+            Error(error.message || 'Failed to create role');
+            console.error('Error details:', error);
+        }
+    }, [roleName, description, permissions, dispatch]);
+
+    const PermissionModule = React.memo(({ module, category, moduleIndex }) => (
         <div className="flex bg-black h-52 w-72 rounded-md p-4 mb-4 flex-col">
-            <p className="text-white font-semibold mb-4">{formatModuleName(module.module)}</p>
+            <p className="text-white font-semibold mb-4">
+                {module.module.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim()}
+            </p>
             <div className="flex flex-col gap-3">
                 {['read', 'add', 'edit', 'delete'].map((permission) => (
                     module[permission] !== undefined && (
@@ -123,7 +161,7 @@ function CreateRole() {
                 ))}
             </div>
         </div>
-    );
+    ));
 
     const allModules = Object.entries(permissions).flatMap(([category, modules]) =>
         modules.map((module, moduleIndex) => ({
@@ -134,56 +172,6 @@ function CreateRole() {
     );
 
     const rows = Math.ceil(allModules.length / 4);
-
-
-    const handleSubmit = async () => {
-
-        // console.log("per",permissions);
-        // return
-
-
-        try {
-
-            if (!roleName || !description) {
-                alert('must have value')
-                return
-            }
-
-            if (roleName.length < 3) {
-                alert('enter valid role name , min 3 ')
-                return
-            }
-
-            const formData = {
-                name: roleName,
-                description,
-                permissions
-            };
-
-            const response = await createRole(formData)
-
-            console.log("create role res", response);
-
-
-            if (response.status === 201) {
-                alert('role created succesfully')
-                dispatch(setActiveTab("list"))
-                return
-            }
-
-            if (response.status === 400) {
-                alert('Role with this name already exists')
-                return
-            }
-
-        } catch (error) {
-            alert('api failed ')
-        }
-
-    };
-
-
-
 
     return (
         <div className="w-full h-auto rounded-md bg-gray p-5">
@@ -199,7 +187,6 @@ function CreateRole() {
                             width="w-full"
                         />
                     </div>
-
                     <div className="w-1/2">
                         <TextInput
                             disabled={viewItem.isView}
@@ -210,10 +197,11 @@ function CreateRole() {
                             width="w-full"
                         />
                     </div>
-
-
-                    <Button disabled={viewItem.isView}
-                        onClick={handleSubmit} className='mt-7' />
+                    <Button 
+                        disabled={viewItem.isView}
+                        onClick={handleSubmit} 
+                        className='mt-7' 
+                    />
                 </div>
 
                 <div className="mt-8 flex flex-col gap-4">
@@ -235,4 +223,4 @@ function CreateRole() {
     );
 }
 
-export default CreateRole;
+export default React.memo(CreateRole);

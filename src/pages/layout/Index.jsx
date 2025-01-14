@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { Link, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
@@ -23,12 +23,8 @@ const Index = () => {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('Dashboard');
     const [openSubMenu, setOpenSubMenu] = useState(null);
-    const location = useLocation();
     const dispatch = useDispatch()
-
-    console.log("permission in layout",permissions);
     
-
     console.log("per", permissions);
     console.log("iddd :", roleId);
 
