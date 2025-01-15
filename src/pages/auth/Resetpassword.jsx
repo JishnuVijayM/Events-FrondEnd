@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { resetPassword } from '../../service/api/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { Error, Success } from '../../components/Notification';
 
 function Resetpassword() {
     const [showPassword, setShowPassword] = useState(false);
@@ -41,21 +42,23 @@ function Resetpassword() {
             const response = await resetPassword(values,token);
 
             if (response?.status === 200) {
-                alert('reset success')
+                Success('Password reset successfully.')
                 navigate('/')
             } else if (response?.status === 400) {
                 setErrors({ password: 'Invalid input or missing fields' });
             } else if (response?.status === 401) {
-                alert('session expired')
+                Error('Session expired')
                 // setErrors({ password: 'Invalid credentials' });
             } else if (response?.status === 404) {
-                alert('user not found')
+                Error('User not found')
             } else {
                 setErrors({ password: 'Reset failed. Please try again later.' });
+                Error('Reset failed. Please try again later.')
             }
         } catch (error) {
             console.error('Error:', error);
             setErrors({ password: 'An unexpected error occurred.' });
+            Error('Reset failed. Please try again later.')
         } finally {
             setSubmitting(false);
         }

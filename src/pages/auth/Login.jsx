@@ -8,6 +8,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { handleAddPermissions, handleClearPermission, setRoleId } from '../../redux/rolePrevilages/permissionsSlice';
 import { getRole } from '../../service/api/api';
+import { Error, Success, Warning } from '../../components/Notification';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -29,61 +30,64 @@ function Login() {
     });
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
-
-        localStorage.clear();
-
         try {
-            dispatch(handleClearPermission())
             setSubmitting(true);
+            localStorage.clear();
+            dispatch(handleClearPermission());
+    
+            // Attempt to log in
             const response = await login(values);
-
+    
             if (response?.status === 200) {
-                dispatch(setRoleId(response?.data?.role))
-                localStorage.setItem('token', response?.data?.token);
-                localStorage.setItem('id', response?.data?.role);
-
-                if (!response?.data?.role) {
-                    return
+                const { role, token } = response.data;
+    
+                if (role && token) {
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('id', role);
+                    dispatch(setRoleId(role));
+    
+                    // Fetch permissions
+                    const permissionResponse = await getRole(role);
+    
+                    if (permissionResponse?.status === 200) {
+                        dispatch(handleAddPermissions(permissionResponse.data.permissions));
+                        Success('Login successful!');
+                        navigate('admin');
+                    } else {
+                        handleFetchError(permissionResponse);
+                    }
+                } else {
+                    handleError(400, setErrors);
                 }
-
-                handleFetchPermission(response?.data?.role)
-
-            } else if (response?.status === 400) {
-                setErrors({ email: 'Invalid input or missing fields' });
-            } else if (response?.status === 401) {
-                setErrors({ password: 'Invalid credentials' });
             } else {
-                setErrors({ email: 'Login failed. Please try again later.' });
+                handleError(response?.status, setErrors);
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Error during login or permission fetch:', error);
             setErrors({ email: 'An unexpected error occurred. Please try again later.' });
+            Error('An unexpected error occurred. Please try again later.');
         } finally {
             setSubmitting(false);
         }
     };
-
-    const handleFetchPermission = async (role) => {
-        if (!role) {
-            return
-        }
-
-        try {
-            const response = await getRole(role)
-
-            console.log("res per",response.data.permissions);
-            
-
-            if (response.status === 200) {
-                alert('Login successful!');
-                navigate('admin');
-                dispatch(handleAddPermissions(response?.data.permissions))
-                
-            }
-        } catch (error) {
-            console.log("permission error", error);
-        }
-    }
+    
+    const handleError = (status, setErrors) => {
+        const errorMessages = {
+            400: 'Invalid input or missing fields',
+            401: 'Invalid credentials',
+            default: 'Login failed. Please try again later.'
+        };
+    
+        const message = errorMessages[status] || errorMessages.default;
+        setErrors({ email: message });
+        Warning(message);
+    };
+    
+    const handleFetchError = (response) => {
+        Error('Failed to fetch permissions');
+        console.error('Permission fetch error:', response);
+    };
+    
 
     return (
         <div className="flex-1 bg-white w-full h-full flex items-center justify-between flex-col p-6">

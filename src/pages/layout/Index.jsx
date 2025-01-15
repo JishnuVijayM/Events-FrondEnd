@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
@@ -24,18 +24,16 @@ const Index = () => {
     const [selectedMenu, setSelectedMenu] = useState('Dashboard');
     const [openSubMenu, setOpenSubMenu] = useState(null);
     const dispatch = useDispatch()
-    
-    console.log("per", permissions);
-    console.log("iddd :", roleId);
+    const navigate = useNavigate();
+
 
     const handleFetchPermission = async () => {
 
         const roleId = localStorage.getItem('id')
 
-        console.log("layout", roleId);
-
         if (!roleId) {
             alert('session expired, login again')
+            navigate('/')
             return
         }
 
@@ -44,9 +42,7 @@ const Index = () => {
 
             if (response.status === 200) {
                 dispatch(handleAddPermissions(response?.data.permissions))
-            } else {
-                alert('session expired, login again')
-            }   
+            } 
         } catch (error) {
             console.log("permission error", error);
         }

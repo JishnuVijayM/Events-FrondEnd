@@ -1,6 +1,6 @@
 import React from 'react';
 
-function TextInput({ label, placeholder, onChange, name, width = 'w-1/3', value, disabled }) {
+function TextInput({ label, placeholder, onChange, name, width = 'w-1/3', value, disabled,error }) {
     return (
         <div className={`flex flex-col ${width}`}>
             <label className='text-white mb-1'>{label}</label>
@@ -13,6 +13,7 @@ function TextInput({ label, placeholder, onChange, name, width = 'w-1/3', value,
                 onChange={(e) => onChange(e.target)}
                 className="p-2 rounded outline-none bg-black text-gray-400 disabled:cursor-not-allowed focus:shadow-none disabled:text-slate-400"
             />
+            <p className='text-red-500 font-normal text-end'>{error}</p>
         </div>
     );
 }

@@ -37,6 +37,10 @@ function CreateRole() {
     const [roleName, setRoleName] = useState('');
     const [description, setDescription] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState({
+        name: "",
+        description: ""
+    })
     const dispatch = useDispatch();
     const { viewItem } = useSelector((state) => state.tabContent);
 
@@ -49,7 +53,7 @@ function CreateRole() {
         setIsLoading(true);
         try {
             const response = await getRole(viewItem.id);
-            
+
             if (response.status === 200) {
                 setRoleName(response.data?.name || '');
                 setDescription(response.data?.description || '');
@@ -104,12 +108,18 @@ function CreateRole() {
 
     const handleSubmit = useCallback(async () => {
         if (!roleName?.trim() || !description?.trim()) {
-            Warning('All fields are required');
+            setError({
+                name: "Enter role name",
+                description: "Enter description"
+            })
             return;
         }
 
         if (roleName.trim().length < 3) {
-            Warning('Role name must be at least 3 characters long');
+            setError({
+                ...error,
+                name: "Role name must be at least 3 characters long"
+            });
             return;
         }
 
@@ -121,7 +131,7 @@ function CreateRole() {
             };
 
             const response = await createRole(formData);
-            
+
             if (response.status === 201) {
                 Success('Role created successfully');
                 dispatch(setActiveTab("list"));
@@ -152,7 +162,7 @@ function CreateRole() {
                                 type="checkbox"
                                 checked={module[permission]}
                                 onChange={() => handleCheckboxChange(category, moduleIndex, permission)}
-                                className="mr-2 h-4 w-4 bg-black border-white outline-none focus:ring-0 disabled:cursor-not-allowed"
+                                className="mr-2 h-4 w-4 bg-black  border-white outline-none focus:ring-0 disabled:cursor-not-allowed"
                                 disabled={viewItem.isView || (permission !== 'read' && !module.read)}
                             />
                             {permission.charAt(0).toUpperCase() + permission.slice(1)}
@@ -181,26 +191,42 @@ function CreateRole() {
                         <TextInput
                             disabled={viewItem.isView}
                             value={roleName}
-                            onChange={(e) => setRoleName(e.value)}
+                            onChange={(e) => {
+                                setRoleName(e.value); 
+                                setError(prevState => ({
+                                    ...prevState, 
+                                    name: "",  
+                                    description: ""
+                                }));
+                            }}
                             label={'Role Name'}
                             placeholder={'Enter Role Name'}
                             width="w-full"
+                            error={error.name}
                         />
                     </div>
                     <div className="w-1/2">
                         <TextInput
                             disabled={viewItem.isView}
                             value={description}
-                            onChange={(e) => setDescription(e.value)}
+                            onChange={(e) => {
+                                setDescription(e.value); 
+                                setError(prevState => ({
+                                    ...prevState, 
+                                    name: "",  
+                                    description: ""
+                                }));
+                            }}
                             label={'Description'}
                             placeholder={'Enter Description'}
                             width="w-full"
+                            error={error.description}
                         />
                     </div>
-                    <Button 
+                    <Button
                         disabled={viewItem.isView}
-                        onClick={handleSubmit} 
-                        className='mt-7' 
+                        onClick={handleSubmit}
+                        className='mt-7'
                     />
                 </div>
 

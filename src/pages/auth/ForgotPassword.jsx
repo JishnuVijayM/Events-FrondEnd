@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { forgotPassword } from '../../service/api/auth';
+import { Error, Success, Warning } from '../../components/Notification';
 
 
 function ForgotPassword() {
@@ -20,7 +21,7 @@ function ForgotPassword() {
                 'Email must be a valid format (e.g., example@domain.com)'
             ),
     });
-    
+
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
@@ -30,20 +31,22 @@ function ForgotPassword() {
             console.log(response?.data);
 
             if (response?.status === 200) {
-                alert('mail send to email')
+                Success('Mail send to email')
             } else if (response?.status === 400) {
                 setErrors({ email: 'Invalid input or missing fields' });
             } else if (response?.status === 404) {
-                alert('User not found')
-                // setErrors({ password: 'Invalid credentials' });
+                Warning('User not found. Please check the email and try again.')
+                setErrors({ password: 'Invalid credentials' });
             } else if (response?.status === 451) {
-                alert('Mail not send')
+                Warning('Mail not send')
             } else {
                 setErrors({ email: 'Login failed. Please try again later.' });
+                Error('Please try again later.')
             }
         } catch (error) {
             console.error('Login error:', error);
             setErrors({ email: 'An unexpected error occurred. Please try again later.' });
+            Error('An unexpected error occurred. Please try again later.')
         } finally {
             setSubmitting(false);
         }

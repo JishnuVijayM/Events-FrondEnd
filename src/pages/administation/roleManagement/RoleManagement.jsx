@@ -70,7 +70,7 @@ const RoleManagement = () => {
 
     return (
         <div>
-            <Tab pageName="Role Management" tabs={tabs} tabContent={tabContent} />
+            <Tab tabs={tabs} tabContent={tabContent} />
         </div>
     );
 };

@@ -1,19 +1,30 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveTab } from "../redux/tabContents/tabSlice";
+import { useLocation } from 'react-router-dom';
 
-const Tab = ({pageName,tabs,tabContent}) => {
+
+const Tab = ({ tabs, tabContent }) => {
     const { activeTab } = useSelector((state) => state.tabContent);
     const dispatch = useDispatch()
+    const location = useLocation();
+    const { pathname } = location;
+    const [urlName,_]=useState(pathname.split('/')[2])
+
+    const toTitleCase = (str) => {
+        return str
+            .replace(/-/g, ' ') 
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
 
     return (
         <div className="w-full mx-auto bg-black  p-2">
 
             <div className="p-5">
-                <h1 className="font-bold text-4xl text-white">{pageName}</h1>
+                <h1 className="font-bold text-4xl text-white">{toTitleCase(urlName)}</h1>
                 <div className="flex">
                     <p className="text-primary">Dashboard</p>
-                    <p className="text-slate-500 ms-2">{pageName}</p>
+                    <p className="text-slate-500 ms-2">{toTitleCase(urlName)}</p>
                 </div>
             </div>
 
