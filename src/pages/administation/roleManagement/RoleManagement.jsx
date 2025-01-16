@@ -21,14 +21,6 @@ const RoleManagement = () => {
             try {
                 const { data } = await getAllRole();
                 if (Array.isArray(data)) {
-                    // const formattedData = data.map((role, index) => ({
-                    //     id: role._id,
-                    //     no: index + 1,
-                    //     'role-name': role.name,
-                    //     description: role.description,
-                    //     'updated-by': 'System',
-                    //     'last-updated': new Date(role.updatedAt).toLocaleString(),
-                    // }));
                     setTableData(data);
                 }
             } catch (error) {

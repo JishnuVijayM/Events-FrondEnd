@@ -68,7 +68,7 @@ const UserManagement = () => {
 
     return (
         <div>
-            <Tab pageName="User Management" tabs={tabs} tabContent={tabContent} />
+            <Tab tabs={tabs} tabContent={tabContent} />
         </div>
     )
 }
