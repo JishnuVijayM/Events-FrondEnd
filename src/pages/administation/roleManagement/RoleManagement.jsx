@@ -21,15 +21,15 @@ const RoleManagement = () => {
             try {
                 const { data } = await getAllRole();
                 if (Array.isArray(data)) {
-                    const formattedData = data.map((role, index) => ({
-                        id: role._id,
-                        no: index + 1,
-                        'role-name': role.name,
-                        description: role.description,
-                        'updated-by': 'System',
-                        'last-updated': new Date(role.updatedAt).toLocaleString(),
-                    }));
-                    setTableData(formattedData);
+                    // const formattedData = data.map((role, index) => ({
+                    //     id: role._id,
+                    //     no: index + 1,
+                    //     'role-name': role.name,
+                    //     description: role.description,
+                    //     'updated-by': 'System',
+                    //     'last-updated': new Date(role.updatedAt).toLocaleString(),
+                    // }));
+                    setTableData(data);
                 }
             } catch (error) {
                 console.error("Error fetching roles:", error);
@@ -48,8 +48,8 @@ const RoleManagement = () => {
     ], []);
 
     const columnHeaders = [
-        { key: 'no', label: 'NO', size: 50 },
-        { key: 'role-name', label: 'ROLE NAME', size: 100 },
+        { key: 'no', label: 'NO', size: 20 },
+        { key: 'name', label: 'ROLE NAME', size: 100 },
         { key: 'description', label: 'DESCRIPTION', size: 200 },
         { key: 'updated-by', label: 'UPDATED BY', size: 150 },
         { key: 'last-updated', label: 'LAST UPDATED', size: 150 },

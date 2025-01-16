@@ -10,6 +10,7 @@ import UserManagement from '../administation/userManagement/UserManagement';
 import Authentication from '../administation/authentication/authentication';
 import { getRole } from '../../service/api/api';
 import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlice';
+import { setActiveTab } from '../../redux/tabContents/tabSlice';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -18,7 +19,7 @@ const Avatar = () => (
 );
 
 const Index = () => {
-    const { roleId, permissions } = useSelector((state) => state.adminPermissions);
+    const { permissions } = useSelector((state) => state.adminPermissions);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('Dashboard');
@@ -65,7 +66,6 @@ const Index = () => {
             return permissionGroup.some(module => module.read === true);
         }
 
-        // For submenus, check specific module permission
         const modulePermission = permissionGroup.find(module =>
             module.module.toLowerCase() === subModule.toLowerCase()
         );
@@ -223,6 +223,7 @@ const Index = () => {
 
     const handleMenu = (itemName) => {
         setSelectedMenu(itemName);
+        dispatch(setActiveTab('list'));
     };
 
     const handleSubMenuToggle = (parentId) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
-import { createRole, getRole } from '../../../service/api/api';
+import { createRole, editRole, getRole } from '../../../service/api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 import Loader from '../../../components/Loader';
@@ -42,17 +42,21 @@ function CreateRole() {
         description: ""
     })
     const dispatch = useDispatch();
-    const { viewItem } = useSelector((state) => state.tabContent);
+    const { viewItem, editItem } = useSelector((state) => state.tabContent);
+
+    console.log("edit", editItem);
+    console.log("view", viewItem);
+
 
     const getRoleData = useCallback(async () => {
-        if (!viewItem?.id) {
+        if (!viewItem?.id && !editItem?.id) {
             Warning('Role ID is required');
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await getRole(viewItem.id);
+            const response = await getRole(viewItem.id || editItem?.id);
 
             if (response.status === 200) {
                 setRoleName(response.data?.name || '');
@@ -74,13 +78,15 @@ function CreateRole() {
         } finally {
             setIsLoading(false);
         }
-    }, [viewItem?.id]);
+    }, [viewItem?.id, editItem?.id]);
 
     useEffect(() => {
-        if (viewItem?.id && (viewItem?.isView || viewItem?.isEdit)) {
+        if ((viewItem?.id && (viewItem.isView || viewItem.isEdit)) || (editItem?.id && (editItem.isView || editItem.isEdit))) {
             getRoleData();
         }
-    }, [getRoleData, viewItem?.id, viewItem?.isView, viewItem?.isEdit]);
+    }, [getRoleData, viewItem, editItem]);
+
+
 
     const handleCheckboxChange = useCallback((category, moduleIndex, permission) => {
         setPermissions(prevPermissions => {
@@ -130,21 +136,23 @@ function CreateRole() {
                 permissions
             };
 
-            const response = await createRole(formData);
+            if (editItem.isEdit) {
+                var response = await editRole(editItem?.id, formData);
+
+
+            } else {
+                var response = await createRole(formData);
+            }
+
 
             if (response.status === 201) {
-                Success('Role created successfully');
+                Success(response.data.message);
                 dispatch(setActiveTab("list"));
             } else {
-                const errorMessages = {
-                    400: 'Role already exists',
-                    404: 'Resource not found',
-                    500: 'An internal server error occurred'
-                };
-                Error(response.data?.message || errorMessages[response.status] || 'Unexpected error occurred');
+                Error(response.response.data.message || 'Unexpected error occurred');
             }
         } catch (error) {
-            Error(error.message || 'Failed to create role');
+            Error(error.message || `Failed to ${editItem.isEdit ? 'Update' : 'create'} role`);
             console.error('Error details:', error);
         }
     }, [roleName, description, permissions, dispatch]);
@@ -192,10 +200,10 @@ function CreateRole() {
                             disabled={viewItem.isView}
                             value={roleName}
                             onChange={(e) => {
-                                setRoleName(e.value); 
+                                setRoleName(e.value);
                                 setError(prevState => ({
-                                    ...prevState, 
-                                    name: "",  
+                                    ...prevState,
+                                    name: "",
                                     description: ""
                                 }));
                             }}
@@ -210,10 +218,10 @@ function CreateRole() {
                             disabled={viewItem.isView}
                             value={description}
                             onChange={(e) => {
-                                setDescription(e.value); 
+                                setDescription(e.value);
                                 setError(prevState => ({
-                                    ...prevState, 
-                                    name: "",  
+                                    ...prevState,
+                                    name: "",
                                     description: ""
                                 }));
                             }}
@@ -224,6 +232,7 @@ function CreateRole() {
                         />
                     </div>
                     <Button
+                        label={editItem.isEdit ? "Update" : "Save"}
                         disabled={viewItem.isView}
                         onClick={handleSubmit}
                         className='mt-7'

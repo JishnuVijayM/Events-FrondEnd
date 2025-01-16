@@ -35,7 +35,6 @@ function Login() {
             localStorage.clear();
             dispatch(handleClearPermission());
     
-            // Attempt to log in
             const response = await login(values);
     
             if (response?.status === 200) {

@@ -2,7 +2,7 @@ import axiosInstance from "../axios/axiosInstance"
 
 export const getRole = async (id) => {
     try {
-        const res = await axiosInstance.get(`/admin/getRole/${id}`)
+        const res = await axiosInstance.get(`/role/getRole/${id}`)
         return res
     } catch (error) {
         return error
@@ -11,7 +11,7 @@ export const getRole = async (id) => {
 
 export const getAllRole = async () => {
     try {
-        const res = await axiosInstance.get(`/admin/getRoles`)
+        const res = await axiosInstance.get(`/role/getRoles`)
         return res
     } catch (error) {
         return error
@@ -20,7 +20,7 @@ export const getAllRole = async () => {
 
 export const createRole = async (data) => {
     try {
-        const res = await axiosInstance.post(`/admin/createRole`,data)
+        const res = await axiosInstance.post(`/role/createRole`,data)
         return res
     } catch (error) {
         return error
@@ -31,6 +31,26 @@ export const deleteApi = async (url) => {
     try {
         const res = await axiosInstance.delete(url)
         return res;
+    } catch (error) {
+        return error
+    }
+}
+
+export const editRole = async (id,data) => {
+    try {
+        const res = await axiosInstance.put(`/role/editRole/${id}`,data)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+//user
+
+export const getAllUser = async () => {
+    try {
+        const res = await axiosInstance.get(`/user/getUsers`)
+        return res
     } catch (error) {
         return error
     }

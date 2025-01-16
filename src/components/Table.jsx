@@ -5,8 +5,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useDispatch } from 'react-redux';
-import { clearEditedItem, clearViewedItem, setActiveTab, setViewedItem } from '../redux/tabContents/tabSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearEditedItem, clearViewedItem, setActiveTab, setEditedItem, setViewedItem } from '../redux/tabContents/tabSlice';
 import { useLocation } from 'react-router-dom';
 import { deleteApi } from '../service/api/api';
 import { Error, Success } from './Notification';
@@ -16,6 +16,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
     const dispatch = useDispatch();
     const location = useLocation();
     const { pathname } = location;
+    const { permissions } = useSelector((state) => state.adminPermissions);
 
     useEffect(() => {
         dispatch(clearViewedItem());
@@ -31,10 +32,15 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         dispatch(setActiveTab('add'));
     };
 
+    const handleEdit = (id) => {
+        dispatch(setEditedItem(id));
+        dispatch(setActiveTab('add'));
+    };
+
     const handleDelete = async (id) => {
         const currentPage = pathname.split('/')[2];
         const endpoints = {
-            'role-management': `/admin/deleteRole/${id}`,
+            'role-management': `/role/deleteRole/${id}`,
             company: `/api/companies/${id}`,
             role: `/api/roles/${id}`,
         };
@@ -66,39 +72,77 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         }
     };
 
-    const columns = [
-        ...columnHeaders.map((header) => ({
-            accessorKey: header.key,
-            header: header.label,
-            size: header.size || 150,
-        })),
-        {
-            id: 'actions',
-            header: 'Actions',
-            size: 100,
-            Cell: ({ row }) => (
-                <>
+    const currentPage = pathname?.split('/')[2] || '';
+
+    const getPermissionModule = (page) => {
+        if (!page) return '';
+        return page
+            .split('-')
+            .map((word, index) =>
+                index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+            )
+            .join('');
+    };
+
+    const getModulePermissions = () => {
+        const module = getPermissionModule(currentPage);
+        if (!module || !permissions?.[0]) return null;
+
+        for (const section of Object.values(permissions[0])) {
+            const modulePermissions = section.find(item => item.module === module);
+            if (modulePermissions) {
+                return modulePermissions;
+            }
+        }
+        return null;
+    };
+
+    const modulePermissions = getModulePermissions();
+
+    // Create action column definition
+    const actionColumn = {
+        id: 'actions',
+        header: 'Actions',
+        size: 100,
+        Cell: ({ row }) => (
+            <>
+                {modulePermissions?.read && (
                     <button
                         onClick={() => handleView(row.original.id)}
                         className="hover:bg-primary box-border h-8 w-8 rounded-md mx-2"
                     >
                         <FontAwesomeIcon icon={faEye} />
                     </button>
+                )}
+                {modulePermissions?.edit && (
                     <button
+                        onClick={() => handleEdit(row.original.id)}
                         className="hover:bg-primary box-border h-8 w-8 rounded-md mx-2"
                     >
                         <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
+                )}
+                {modulePermissions?.delete && (
                     <button
                         onClick={() => handleDelete(row.original.id)}
                         className="hover:bg-primary box-border h-8 w-8 rounded-md mx-2"
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
-                </>
-            ),
-        },
-    ];
+                )}
+            </>
+        ),
+    };
+
+    // Create data columns from columnHeaders
+    const dataColumns = columnHeaders.map((header) => ({
+        accessorKey: header.key,
+        header: header.label,
+        size: header.size || 150,
+    }));
+
+    // Combine data columns with action column at the end
+    const columns = [...dataColumns, actionColumn];
 
     const csvConfig = mkConfig({
         fieldSeparator: ',',
@@ -276,7 +320,6 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                             >
                                 <FileDownloadIcon /> EXPORT ALL DATA
                             </button>
-
                             <button
                                 disabled={table.getRowModel().rows.length === 0}
                                 onClick={() => handleExportRows(table.getRowModel().rows)}
@@ -284,11 +327,8 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
                             >
                                 <FileDownloadIcon /> EXPORT PAGE ROWS
                             </button>
-
                             <button
-                                disabled={
-                                    !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
-                                }
+                                disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
                                 onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
                                 className={`text-primary px-3 rounded-md hover:bg-zinc-700 
                                  disabled:text-slate-400 disabled:bg-gray-200 
