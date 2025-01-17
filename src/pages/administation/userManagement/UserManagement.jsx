@@ -1,41 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import Tab from '../../../components/Tab'
-import Table from '../../../components/Table';
+import React from 'react';
 import { getAllUser } from '../../../service/api/api';
-import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import Loader from '../../../components/Loader';
+import PageLayout from '../../layout/PageLayout';
+import CreateUser from './CreateUser';
 
 const UserManagement = () => {
-    const { pathname } = useLocation();
-    const [tableData, setTableData] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const { activeTab } = useSelector((state) => state.tabContent);
-
-    useEffect(() => {
-        const fetchRoles = async () => {
-            if (!pathname.includes('user-management')) return;
-
-            setIsLoading(true);
-            try {
-                const { data } = await getAllUser();
-
-                if (Array.isArray(data)) {
-
-                    setTableData(data);
-                }
-            } catch (error) {
-                console.error("Error fetching roles:", error);
-                setTableData([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchRoles();
-    }, [pathname, activeTab]);
-
-
     const columnHeaders = [
         { key: 'no', label: 'NO', size: 50 },
         { key: 'name', label: 'NAME', size: 100 },
@@ -47,30 +15,15 @@ const UserManagement = () => {
         { key: 'last-updated', label: 'LAST UPDATED', size: 100 },
     ];
 
-    const tabContent = useMemo(() => ({
-        list: (
-            <Loader isLoading={isLoading}>
-                <Table
-                    data={tableData}
-                    columnHeaders={columnHeaders}
-                    exportFileName="User"
-                />
-            </Loader>
-        ),
-        add: <p>New User</p>,
-    }), [isLoading, tableData]);
-
-    const tabs = useMemo(() => [
-        { id: "list", label: "User List" },
-        { id: "add", label: "New user" },
-    ], []);
-
-
     return (
-        <div>
-            <Tab tabs={tabs} tabContent={tabContent} />
-        </div>
-    )
-}
+        <PageLayout
+            pageType="user"
+            fetchData={getAllUser}
+            columnHeaders={columnHeaders}
+            addComponent={<CreateUser/>}
+            pathIdentifier="user-management"
+        />
+    );
+};
 
-export default UserManagement
+export default UserManagement;

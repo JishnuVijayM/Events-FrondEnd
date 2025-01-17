@@ -12,7 +12,7 @@ export const getRole = async (id) => {
 export const getAllRole = async () => {
     try {
         const res = await axiosInstance.get(`/role/getRoles`)
-        return res
+        return res.data
     } catch (error) {
         return error
     }
@@ -50,7 +50,7 @@ export const editRole = async (id,data) => {
 export const getAllUser = async () => {
     try {
         const res = await axiosInstance.get(`/user/getUsers`)
-        return res
+        return res.data
     } catch (error) {
         return error
     }
