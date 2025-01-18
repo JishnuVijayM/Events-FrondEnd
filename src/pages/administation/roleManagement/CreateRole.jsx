@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import TextInput from '../../../components/TextInput';
-import Button from '../../../components/Button';
 import { createRole, editRole, getRole } from '../../../service/api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 import Loader from '../../../components/Loader';
 import { Error, Success, Warning } from '../../../components/Notification';
+import Save from '../../../components/Save';
 
 const initialPermissions = {
     dashboard: [
@@ -231,7 +231,7 @@ function CreateRole() {
                             error={error.description}
                         />
                     </div>
-                    <Button
+                    <Save
                         label={editItem.isEdit ? "Update" : "Save"}
                         disabled={viewItem.isView}
                         onClick={handleSubmit}

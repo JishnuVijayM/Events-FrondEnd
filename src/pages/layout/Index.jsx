@@ -237,7 +237,7 @@ const Index = () => {
     return (
         <>
             {/* Navbar */}
-            <nav className="fixed top-0 z-50 w-full bg-gradient-to-r from-white to-primary border-b border-gray-200">
+            <nav className="fixed top-0 z-50 w-full bg-gradient-to-r from-white to-primary border-b border-black">
                 <div className="px-3 py-3 lg:px-5 lg:pl-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
@@ -286,7 +286,7 @@ const Index = () => {
             {/* Sidebar */}
             <aside
                 id="logo-sidebar"
-                className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} bg-stone-700 border-r border-gray-200 sm:translate-x-0`}
+                className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} bg-stone-700 border-r border-black sm:translate-x-0`}
                 aria-label="Sidebar"
             >
                 <div className="h-full px-3 pb-4 overflow-y-auto flex flex-col">
@@ -360,7 +360,7 @@ const Index = () => {
             </aside>
 
             {/* Main Content */}
-            <main className={`p-0 sm:ml-64 mt-16 md:mt-[74px] bg-gray-100 text-gray-800`}>
+            <main className={`p-0 sm:ml-64 mt-16 md:mt-[74px] bg-gray-100 text-gray-800 `}>
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="role-management" element={<RoleManagement />} />

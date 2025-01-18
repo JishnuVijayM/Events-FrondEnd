@@ -45,7 +45,7 @@ const Tab = ({ tabs, tabContent }) => {
     };
 
     return (
-        <div className="w-full mx-auto bg-black p-2">
+        <div className="w-full mx-auto bg-black p-2 h-auto">
             <div className="p-5">
                 <h1 className="font-bold text-4xl text-white">{toTitleCase(urlName)}</h1>
                 <div className="flex">

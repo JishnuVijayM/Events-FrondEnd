@@ -1,0 +1,31 @@
+import React from 'react';
+
+function SelectInput({ className, label = 'Option', onChange, value = '', disabled, error, width = 'w-1/3', data = [] }) {
+    const handleChange = (event) => {
+        onChange(event.target.value);
+    };
+
+    return (
+        <div className={`flex flex-col ${width}`}>
+            <label className="text-white mb-1">{label}</label>
+            <select
+                value={value}
+                onChange={handleChange}
+                disabled={disabled}
+                className={`${className} p-2 pr-8 rounded outline-none bg-black text-gray-400 disabled:cursor-not-allowed focus:shadow-none disabled:text-slate-400`}
+            >
+                <option value="" className='text-slate-400'>
+                    Choose a {(label || 'option').toLowerCase()}
+                </option>
+                {data?.map((item) => (
+                    <option key={item.value} value={item.value}>
+                        {item.label}
+                    </option>
+                ))}
+            </select>
+            <p className="text-red-500 font-normal text-end">{error}</p>
+        </div>
+    );
+}
+
+export default SelectInput;  
