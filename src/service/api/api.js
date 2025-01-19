@@ -20,7 +20,7 @@ export const getAllRole = async () => {
 
 export const createRole = async (data) => {
     try {
-        const res = await axiosInstance.post(`/role/createRole`,data)
+        const res = await axiosInstance.post(`/role/createRole`, data)
         return res
     } catch (error) {
         return error
@@ -36,9 +36,9 @@ export const deleteApi = async (url) => {
     }
 }
 
-export const editRole = async (id,data) => {
+export const editRole = async (id, data) => {
     try {
-        const res = await axiosInstance.put(`/role/editRole/${id}`,data)
+        const res = await axiosInstance.put(`/role/editRole/${id}`, data)
         return res
     } catch (error) {
         return error
@@ -55,3 +55,13 @@ export const getAllUser = async () => {
         return error
     }
 }
+
+export const createUser = async (data, headers = {}) => {
+    try {
+        const res = await axiosInstance.post(`/user/createUser`, data, headers);
+        return res;
+    } catch (error) {
+        return error;
+    }
+};
+

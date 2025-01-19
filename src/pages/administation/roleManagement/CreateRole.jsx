@@ -197,6 +197,7 @@ function CreateRole() {
                 <div className="flex justify-center items-start gap-5">
                     <div className="w-1/2">
                         <TextInput
+                            required={true}
                             disabled={viewItem.isView}
                             value={roleName}
                             onChange={(e) => {
@@ -215,6 +216,7 @@ function CreateRole() {
                     </div>
                     <div className="w-1/2">
                         <TextInput
+                            required={true}
                             disabled={viewItem.isView}
                             value={description}
                             onChange={(e) => {

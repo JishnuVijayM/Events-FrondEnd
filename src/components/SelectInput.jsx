@@ -1,16 +1,19 @@
 import React from 'react';
 
-function SelectInput({ className, label = 'Option', onChange, value = '', disabled, error, width = 'w-1/3', data = [] }) {
-    const handleChange = (event) => {
-        onChange(event.target.value);
-    };
+function SelectInput({ className, label = 'Option', onChange, value = '', disabled, error, width = 'w-1/3', data = [], required = false, onBlur, name }) {
+
 
     return (
         <div className={`flex flex-col ${width}`}>
-            <label className="text-white mb-1">{label}</label>
+            <label className='text-white mb-1'>
+                {label} {required && <span className='text-red-500'>*</span>}
+            </label>
+
             <select
+                name={name}
+                onBlur={onBlur}
                 value={value}
-                onChange={handleChange}
+                onChange={onChange}
                 disabled={disabled}
                 className={`${className} p-2 pr-8 rounded outline-none bg-black text-gray-400 disabled:cursor-not-allowed focus:shadow-none disabled:text-slate-400`}
             >
@@ -23,7 +26,7 @@ function SelectInput({ className, label = 'Option', onChange, value = '', disabl
                     </option>
                 ))}
             </select>
-            <p className="text-red-500 font-normal text-end">{error}</p>
+            <p className="p-0 m-0 text-red-600 font-normal text-end">{error}</p>
         </div>
     );
 }

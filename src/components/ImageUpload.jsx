@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function ImageUpload({ className }) {
+function ImageUpload({ className, label, required = false, error, onImageSelect,name,onBlur }) {
     const [selectedImage, setSelectedImage] = useState(null);
 
     const handleImageChange = (e) => {
@@ -9,23 +9,30 @@ function ImageUpload({ className }) {
             const reader = new FileReader();
             reader.onload = () => {
                 setSelectedImage(reader.result);
+                if (onImageSelect) {
+                    onImageSelect(file);
+                }
             };
             reader.readAsDataURL(file);
         }
     };
 
     return (
-        <> <span className="text-gray-600 font-medium">Upload file</span>
-            <div className={`rounded-md border border-white bg-gray-50 h-32 shadow-md  ${className}`}>
+        <>
+            <label className='text-white mb-1 ms-2'>
+                {label} {required && <span className='text-red-500'>*</span>}
+            </label>
+            <div className={`rounded-md bg-gray-50 h-44 shadow-md mt-1 bg-black ${className}`}>
                 <label htmlFor="upload" className="flex flex-col items-center cursor-pointer">
                     {selectedImage ? (
-                        <img src={selectedImage} alt="Selected" className="h-32 w-full pb-1  object-cover rounded-md" />
+                        <img src={selectedImage} alt="Selected" className="h-44 w-full pb-1 object-cover rounded-md" />
                     ) : (
-                        <p className='mt-12'>Choose File</p>
+                        <p className='mt-20'>Choose File</p>
                     )}
                 </label>
-                <input id="upload" type="file" className="hidden" onChange={handleImageChange} />
+                <input onBlur={onBlur} id="upload" type="file" name={name} className="hidden" onChange={handleImageChange} />
             </div>
+            <p className="p-0 m-0 text-red-600 font-normal text-end">{error}</p>
         </>
     );
 }
