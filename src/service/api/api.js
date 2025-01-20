@@ -1,8 +1,8 @@
 import axiosInstance from "../axios/axiosInstance"
 
-export const getRole = async (id) => {
+export const viewRole = async (id) => {
     try {
-        const res = await axiosInstance.get(`/role/getRole/${id}`)
+        const res = await axiosInstance.get(`/role/viewRole/${id}`)
         return res
     } catch (error) {
         return error
@@ -11,7 +11,7 @@ export const getRole = async (id) => {
 
 export const getAllRole = async () => {
     try {
-        const res = await axiosInstance.get(`/role/getRoles`)
+        const res = await axiosInstance.get(`/role/getAllRoles`)
         return res.data
     } catch (error) {
         return error
@@ -45,6 +45,15 @@ export const editRole = async (id, data) => {
     }
 }
 
+export const getRoles = async () => {
+    try {
+        const res = await axiosInstance.get(`/role/getRoles`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
 //user
 
 export const getAllUser = async () => {
@@ -59,7 +68,7 @@ export const getAllUser = async () => {
 export const createUser = async (data, headers = {}) => {
     try {
         const res = await axiosInstance.post(`/user/createUser`, data, headers);
-        return res;
+        return res
     } catch (error) {
         return error;
     }

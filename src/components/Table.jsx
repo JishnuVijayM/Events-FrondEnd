@@ -41,7 +41,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         const currentPage = pathname.split('/')[2];
         const endpoints = {
             'role-management': `/role/deleteRole/${id}`,
-            company: `/api/companies/${id}`,
+            'user-management': `/user/deleteUser/${id}`,
             role: `/api/roles/${id}`,
         };
 

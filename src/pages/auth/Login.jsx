@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { handleAddPermissions, handleClearPermission, setRoleId } from '../../redux/rolePrevilages/permissionsSlice';
-import { getRole } from '../../service/api/api';
+import { viewRole } from '../../service/api/api';
 import { Error, Success, Warning } from '../../components/Notification';
 
 function Login() {
@@ -46,7 +46,7 @@ function Login() {
                     dispatch(setRoleId(role));
     
                     // Fetch permissions
-                    const permissionResponse = await getRole(role);
+                    const permissionResponse = await viewRole(role);
     
                     if (permissionResponse?.status === 200) {
                         dispatch(handleAddPermissions(permissionResponse.data.permissions));

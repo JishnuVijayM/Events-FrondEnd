@@ -8,7 +8,7 @@ import Dashboard from '../dashboard/Index';
 import RoleManagement from '../administation/roleManagement/RoleManagement';
 import UserManagement from '../administation/userManagement/UserManagement';
 import Authentication from '../administation/authentication/authentication';
-import { getRole } from '../../service/api/api';
+import {  viewRole } from '../../service/api/api';
 import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlice';
 import { setActiveTab } from '../../redux/tabContents/tabSlice';
 
@@ -39,7 +39,7 @@ const Index = () => {
         }
 
         try {
-            const response = await getRole(roleId)
+            const response = await viewRole(roleId)
 
             if (response.status === 200) {
                 dispatch(handleAddPermissions(response?.data.permissions))

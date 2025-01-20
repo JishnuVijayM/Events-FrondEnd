@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import TextInput from '../../../components/TextInput';
-import { createRole, editRole, getRole } from '../../../service/api/api';
+import { createRole, editRole, viewRole } from '../../../service/api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 import Loader from '../../../components/Loader';
@@ -37,15 +37,43 @@ function CreateRole() {
     const [roleName, setRoleName] = useState('');
     const [description, setDescription] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState({
-        name: "",
-        description: ""
-    })
     const dispatch = useDispatch();
     const { viewItem, editItem } = useSelector((state) => state.tabContent);
+    const [error, setError] = useState({
+        name: "",
+        description: "",
+        permissions: ""
+    });
 
-    console.log("edit", editItem);
-    console.log("view", viewItem);
+    const validateInputs = () => {
+        let isValid = true;
+        let errors = {};
+
+        if (!roleName.trim()) {
+            errors.name = "Role name is required";
+            isValid = false;
+        } else if (roleName.trim().length < 3) {
+            errors.name = "Role name must be at least 3 characters long";
+            isValid = false;
+        }
+
+        if (!description.trim()) {
+            errors.description = "Description is required";
+            isValid = false;
+        }
+
+        const hasPermission = Object.values(permissions).some(category =>
+            category.some(module => Object.values(module).includes(true))
+        );
+
+        if (!hasPermission) {
+            errors.permissions = "At least one permission must be granted";
+            isValid = false;
+        }
+
+        setError(errors);
+        return isValid;
+    };
 
 
     const getRoleData = useCallback(async () => {
@@ -56,7 +84,7 @@ function CreateRole() {
 
         setIsLoading(true);
         try {
-            const response = await getRole(viewItem.id || editItem?.id);
+            const response = await viewRole(viewItem.id || editItem?.id);
 
             if (response.status === 200) {
                 setRoleName(response.data?.name || '');
@@ -113,49 +141,34 @@ function CreateRole() {
     }, []);
 
     const handleSubmit = useCallback(async () => {
-        if (!roleName?.trim() || !description?.trim()) {
-            setError({
-                name: "Enter role name",
-                description: "Enter description"
-            })
-            return;
-        }
-
-        if (roleName.trim().length < 3) {
-            setError({
-                ...error,
-                name: "Role name must be at least 3 characters long"
-            });
-            return;
-        }
-
+        if (!validateInputs()) return;
+    
+        setIsLoading(true);
         try {
             const formData = {
                 name: roleName.trim(),
                 description: description.trim(),
                 permissions
             };
-
-            if (editItem.isEdit) {
-                var response = await editRole(editItem?.id, formData);
-
-
-            } else {
-                var response = await createRole(formData);
-            }
-
-
+    
+            const response = editItem.isEdit 
+                ? await editRole(editItem.id, formData)
+                : await createRole(formData);
+    
             if (response.status === 201) {
                 Success(response.data.message);
                 dispatch(setActiveTab("list"));
             } else {
-                Error(response.response.data.message || 'Unexpected error occurred');
+                Warning(response.response.data.message || 'Unexpected error occurred');
             }
         } catch (error) {
-            Error(error.message || `Failed to ${editItem.isEdit ? 'Update' : 'create'} role`);
+            Error(error.message || `Failed to ${editItem.isEdit ? 'update' : 'create'} role`);
             console.error('Error details:', error);
+        } finally {
+            setIsLoading(false);
         }
     }, [roleName, description, permissions, dispatch]);
+    
 
     const PermissionModule = React.memo(({ module, category, moduleIndex }) => (
         <div className="flex bg-black h-52 w-72 rounded-md p-4 mb-4 flex-col">
@@ -200,14 +213,7 @@ function CreateRole() {
                             required={true}
                             disabled={viewItem.isView}
                             value={roleName}
-                            onChange={(e) => {
-                                setRoleName(e.value);
-                                setError(prevState => ({
-                                    ...prevState,
-                                    name: "",
-                                    description: ""
-                                }));
-                            }}
+                            onChange={(e) => setRoleName(e.target.value)}
                             label={'Role Name'}
                             placeholder={'Enter Role Name'}
                             width="w-full"
@@ -219,14 +225,7 @@ function CreateRole() {
                             required={true}
                             disabled={viewItem.isView}
                             value={description}
-                            onChange={(e) => {
-                                setDescription(e.value);
-                                setError(prevState => ({
-                                    ...prevState,
-                                    name: "",
-                                    description: ""
-                                }));
-                            }}
+                            onChange={(e) => setDescription(e.target.value)}
                             label={'Description'}
                             placeholder={'Enter Description'}
                             width="w-full"
@@ -240,6 +239,8 @@ function CreateRole() {
                         className='mt-7'
                     />
                 </div>
+
+                {error.permissions && <p className="text-red-500">{error.permissions}</p>}
 
                 <div className="mt-8 flex flex-col gap-4">
                     {[...Array(rows)].map((_, rowIndex) => (
