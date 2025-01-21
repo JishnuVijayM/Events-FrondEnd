@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { handleAddPermissions, handleClearPermission, setRoleId } from '../../redux/rolePrevilages/permissionsSlice';
-import { viewRole } from '../../service/api/api';
 import { Error, Success, Warning } from '../../components/Notification';
+import { viewRole } from '../../service/api/api';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);

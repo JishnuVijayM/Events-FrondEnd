@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import TextInput from '../../../components/TextInput';
@@ -6,23 +6,13 @@ import SelectInput from '../../../components/SelectInput';
 import Save from '../../../components/Save';
 import Reset from '../../../components/Reset';
 import ImageUpload from '../../../components/ImageUpload';
-import { createUser, getRoles } from '../../../service/api/api';
+import { createUser, getCity, getCountry, getRoles, getState, viewUser } from '../../../service/api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../../components/Loader';
 import { Error, Success, Warning } from '../../../components/Notification';
+import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 
-const validationSchema = Yup.object({
-    userName: Yup.string().required('Name is required'),
-    // profilePicture: Yup.string().required('required'),
-    // phone: Yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile is required'),
-    // role: Yup.string().required('Role is required'),
-    // country: Yup.string().required('Country is required'),
-    // state: Yup.string().required('State is required'),
-    // district: Yup.string().required('District is required'),
-    // email: Yup.string().email('Invalid email address').required('Email is required'),
-    // password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-    // confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
-});
+
 
 function CreateUser() {
     const [imageFile, setImageFile] = useState(null);
@@ -31,66 +21,25 @@ function CreateUser() {
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const { viewItem, editItem } = useSelector((state) => state.tabContent);
+    const [countryData, setCountryData] = useState([]);
+    const [stateData, setStateData] = useState([]);
+    const [cityData, setCityData] = useState([]);
+
 
     console.log(viewItem, editItem);
 
-
-    useEffect(() => {
-        fetchDropdownData()
-    }, [])
-
-    const fetchDropdownData = async () => {
-        try {
-            const roleRes = await getRoles()
-
-            if (roleRes.status === 200) {
-                setRoleData(roleRes.data)
-            }
-
-        } catch (error) {
-            console.log("fetching dropdown error", error);
-        }
-    }
-
-
-
-    const handleSubmit = async (event, formData) => {
-        event.preventDefault();
-        setIsLoading(true);
-
-        try {
-            const response = await createUser(formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
-
-            console.log('Full response:', response);
-
-            if (response.status === 400) {
-                Warning(response.response.data.message || 'An error occurred!');
-                return;
-            }
-
-            if (response.status === 201) {
-                Success(response.data.message);
-                return;
-            }
-
-        } catch (error) {
-
-            console.log("e",error);
-
-            // Handle network errors or unexpected issues
-            // const errorMessage = error?.response?.data?.message || error.message || 'An unexpected error occurred. Please try again later.';
-            // Error(errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-
-
+    const validationSchema = Yup.object({
+        userName: Yup.string().required('Name is required'),
+        profilePicture: Yup.string().required('required'),
+        phone: Yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile is required'),
+        role: Yup.string().required('Role is required'),
+        country: Yup.string().required('Country is required'),
+        state: Yup.string().required('State is required'),
+        district: Yup.string().required('District is required'),
+        email: Yup.string().email('Invalid email address').required('Email is required'),
+        password: editItem?.isEdit ? Yup.string() : Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
+        confirmPassword: editItem?.isEdit ? Yup.string() : Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
+    });
 
     const formik = useFormik({
         initialValues: {
@@ -124,6 +73,167 @@ function CreateUser() {
     });
 
 
+    useEffect(() => {
+        fetchDropdownData()
+    }, [])
+
+    const fetchDropdownData = async () => {
+        try {
+            const [roleRes, countryRes] = await Promise.all([getRoles(), getCountry()]);
+    
+            if (roleRes.status === 200) {
+                setRoleData(roleRes.data);
+            } else {
+                console.warn('Failed to fetch roles:', roleRes.status);
+            }
+    
+            if (countryRes.status === 200) {
+                const updatedData = countryRes?.data?.map((item) => ({
+                    value: item.iso2,
+                    label: item.name
+                }));
+                setCountryData(updatedData);
+            } else {
+                console.warn('Failed to fetch countries:', countryRes.status);
+            }
+    
+        } catch (error) {
+            console.error("Error fetching dropdown data:", error);
+        }
+    };
+
+
+    const fetchState= async ()=>{
+        try {
+            const res = await getState(formik.values.country)
+
+            if (res.status === 200) {
+
+                const updatedData = res?.data?.map((item) => {
+                    return {
+                        value: item.iso2,
+                        label: item.name
+                    }
+                })
+
+                setStateData(updatedData);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const fetchCity= async ()=>{
+        try {
+            const res = await getCity(formik.values.country , formik.values.state)
+
+            if (res.status === 200) {
+
+                console.log("city",res);
+                
+                const updatedData = res?.data?.map((item) => {
+                    return {
+                        value: item.name,
+                        label: item.name
+                    }
+                })
+
+                setCityData(updatedData);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        if (formik.values.country) {
+            fetchState();
+        }
+        if (formik.values.country && formik.values.state) {
+            fetchCity();
+        }
+    }, [formik.values.country, formik.values.state]);
+    
+
+    const getUserData = useCallback(async () => {
+        if (!viewItem?.id && !editItem?.id) {
+            Warning('ID is required');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await viewUser(viewItem.id || editItem?.id);
+
+
+            if (response.status === 200) {
+                const data = response.data;
+                formik.setValues({
+                    userName: data.userName || '',
+                    phone: data.phone || '',
+                    password: '',
+                    email: data.email || '',
+                    role: data.role || '',
+                    country: data.country || '',
+                    state: data.state || '',
+                    district: data.district || '',
+                    profilePicture: data.profilePicture || ''
+                });
+
+            } else {
+                dispatch(setActiveTab("list"));
+                Error(response.data?.message || 'Unexpected error occurred');
+                console.error('Error fetching user:');
+            }
+        } catch (error) {
+            dispatch(setActiveTab("list"));
+            Error(error.message || 'Failed to fetch user details');
+            console.error('Error fetching user:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [viewItem?.id, editItem?.id]);
+
+    useEffect(() => {
+        if ((viewItem?.id && (viewItem.isView || viewItem.isEdit)) || (editItem?.id && (editItem.isView || editItem.isEdit))) {
+            getUserData();
+        }
+    }, [viewItem, editItem]);
+
+
+    const handleSubmit = async (event, formData) => {
+        event.preventDefault();
+        setIsLoading(true);
+        setIsSubmitting(true)
+
+        try {
+            const response = await createUser(formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            console.log('Full response:', response);
+
+            if (response.status === 400) {
+                Warning(response.response.data.message || 'An error occurred!');
+                return;
+            }
+
+            if (response.status === 201) {
+                Success(response.data.message);
+                dispatch(setActiveTab("list"));
+                return;
+            }
+
+        } catch (error) {
+            Error(error.message);
+        } finally {
+            setIsSubmitting(false)
+            setIsLoading(false);
+        }
+    };
+
     const handleImageSelect = (file) => {
         setImageFile(file);
         formik.setFieldValue('profilePicture', file);
@@ -139,6 +249,7 @@ function CreateUser() {
                     <form onSubmit={formik.handleSubmit}>
                         <div className="flex w-full">
                             <TextInput
+                                disabled={viewItem.isView}
                                 required
                                 label="Name"
                                 placeholder="Enter name"
@@ -150,6 +261,7 @@ function CreateUser() {
                                 error={formik.touched.userName && formik.errors.userName}
                             />
                             <TextInput
+                                disabled={viewItem.isView}
                                 required
                                 className="mx-2"
                                 label="Mobile"
@@ -162,6 +274,7 @@ function CreateUser() {
                                 error={formik.touched.phone && formik.errors.phone}
                             />
                             <SelectInput
+                                disabled={viewItem.isView}
                                 required
                                 label="Role"
                                 placeholder="Select role"
@@ -177,6 +290,7 @@ function CreateUser() {
 
                         <div className="flex w-full mt-4">
                             <SelectInput
+                                disabled={viewItem.isView}
                                 required
                                 label="Country"
                                 placeholder="Select country"
@@ -186,12 +300,10 @@ function CreateUser() {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 error={formik.touched.country && formik.errors.country}
-                                data={[
-                                    { value: 'option1', label: 'Option 1' },
-                                    { value: 'option2', label: 'Option 2' }
-                                ]}
+                                data={countryData}
                             />
                             <SelectInput
+                                disabled={viewItem.isView}
                                 required
                                 className="mx-2"
                                 label="State"
@@ -202,12 +314,10 @@ function CreateUser() {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 error={formik.touched.state && formik.errors.state}
-                                data={[
-                                    { value: 'State1', label: 'State 1' },
-                                    { value: 'State2', label: 'State 2' }
-                                ]}
+                                data={stateData}
                             />
                             <SelectInput
+                                disabled={viewItem.isView}
                                 required
                                 label="District"
                                 placeholder="Select District"
@@ -217,15 +327,13 @@ function CreateUser() {
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 error={formik.touched.district && formik.errors.district}
-                                data={[
-                                    { value: 'District1', label: 'District 1' },
-                                    { value: 'District2', label: 'District 2' }
-                                ]}
+                                data={cityData}
                             />
                         </div>
 
                         <div className="flex w-full mt-4">
                             <TextInput
+                                disabled={viewItem.isView}
                                 required
                                 label="Email"
                                 placeholder="Enter email"
@@ -240,6 +348,7 @@ function CreateUser() {
 
                         <div className="flex w-full mt-4">
                             <TextInput
+                                disabled={viewItem.isView}
                                 required
                                 label="Password"
                                 placeholder="Enter password"
@@ -253,6 +362,7 @@ function CreateUser() {
                                 error={formik.touched.password && formik.errors.password}
                             />
                             <TextInput
+                                disabled={viewItem.isView}
                                 required
                                 className="ml-1"
                                 label="Confirm Password"
@@ -268,14 +378,17 @@ function CreateUser() {
                         </div>
 
                         <div className="flex w-full mt-4 justify-center">
-                            <Save className="mr-1" type="submit" disabled={isSubmitting} />
+                            <Save className="mr-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
                             <Reset className="ml-1" type="reset" onClick={formik.handleReset} disabled={isSubmitting} />
                         </div>
                     </form>
                 </div>
 
                 <div className="w-1/5">
-                    <ImageUpload onBlur={formik.handleBlur}
+                    <ImageUpload
+                        disabled={viewItem.isView}
+                        initialImage={formik.values.profilePicture}
+                        onBlur={formik.handleBlur}
                         error={formik.touched.profilePicture && formik.errors.profilePicture} label="Profile Picture"
                         required className="ml-2" name={'profilePicture'} onImageSelect={handleImageSelect} />
                 </div>
