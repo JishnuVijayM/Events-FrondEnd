@@ -26,14 +26,11 @@ const PageLayout = ({
 
             setIsLoading(true);
             try {
-                console.log('Fetching data for:', pageType);
                 const response = await fetchData();
-                console.log('API Response:', response);
 
                 const responseData = response.data || response;
 
                 if (Array.isArray(responseData)) {
-                    console.log('Setting table data:', responseData);
                     setTableData(responseData);
                 } else {
                     console.error('Response data is not an array:', responseData);

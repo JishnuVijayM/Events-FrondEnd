@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faGaugeHigh, faUserLock, faStopwatch, faCalendarCheck, faGear, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import LogoImg from '../../assets/Logo.png';
 import Dashboard from '../dashboard/Index';
@@ -26,6 +26,7 @@ const Index = () => {
     const [openSubMenu, setOpenSubMenu] = useState(null);
     const dispatch = useDispatch()
     const navigate = useNavigate();
+    const { pathname } = useLocation();
 
 
     const handleFetchPermission = async () => {
@@ -50,11 +51,32 @@ const Index = () => {
     }
 
     useEffect(() => {
-        handleFetchPermission()
-    }, [])
+        const pathSegments = pathname.split('/').filter(Boolean); // Split and filter out empty segments
+        const lastSegment = pathSegments[pathSegments.length - 1] || 'dashboard'; // Get the last segment or default to 'dashboard'
 
+        function mapMenuItems(menuItems) {
+            const menuMapping = {};
+        
+            menuItems.forEach(item => {
+                menuMapping[item.id] = item.name;
+        
+                if (item.subMenu && item.subMenu.length > 0) {
+                    item.subMenu.forEach(subItem => {
+                        menuMapping[subItem.id] = subItem.name;
+                    });
+                }
+            });
+        
+            return menuMapping;
+        }
 
-
+        const menuMapping = mapMenuItems(menuItems);
+    
+        setSelectedMenu(menuMapping[lastSegment] || 'Dashboard');
+    
+        handleFetchPermission();
+    }, [pathname]);
+   
     const hasPermission = (menuId, subModule = null) => {
         if (!permissions || !permissions[0]) return false;
 

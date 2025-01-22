@@ -78,7 +78,7 @@ function CreateRole() {
 
     const getRoleData = useCallback(async () => {
         if (!viewItem?.id && !editItem?.id) {
-            Warning('Role ID is required');
+            Warning('Unexpected error occurred');
             return;
         }
 
