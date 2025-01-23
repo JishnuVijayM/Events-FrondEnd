@@ -150,17 +150,22 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         useKeysAsHeaders: true,
         filename: exportFileName,
     });
-
+    
     const handleExportRows = (rows) => {
-        const rowData = rows.map((row) => row.original);
+        const rowData = rows.map((row) => {
+            const { id, ...rest } = row.original; // Exclude 'id' field
+            return rest;
+        });
         const csv = generateCsv(csvConfig)(rowData);
         download(csvConfig)(csv);
     };
-
+    
     const handleExportData = () => {
-        const csv = generateCsv(csvConfig)(tableData);
+        const dataWithoutId = tableData.map(({ id, ...rest }) => rest); // Exclude 'id' field
+        const csv = generateCsv(csvConfig)(dataWithoutId);
         download(csvConfig)(csv);
     };
+    
 
     return (
         <>
