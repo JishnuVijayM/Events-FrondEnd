@@ -121,3 +121,20 @@ export const getCity = async (country,state) => {
         return error
     }
 }
+
+export const editUser = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/user/updateUser/${id}`,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

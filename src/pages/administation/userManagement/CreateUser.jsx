@@ -6,7 +6,7 @@ import SelectInput from '../../../components/SelectInput';
 import Save from '../../../components/Save';
 import Reset from '../../../components/Reset';
 import ImageUpload from '../../../components/ImageUpload';
-import { createUser, getCity, getCountry, getRoles, getState, viewUser } from '../../../service/api/api';
+import { createUser, editUser, getCity, getCountry, getRoles, getState, viewUser } from '../../../service/api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../../components/Loader';
 import { Error, Success, Warning } from '../../../components/Notification';
@@ -26,16 +26,30 @@ function CreateUser() {
     const [cityData, setCityData] = useState([]);
 
 
-    console.log(viewItem, editItem);
-
     const validationSchema = Yup.object({
         userName: Yup.string().required('Name is required'),
-        profilePicture: Yup.string().required('required'),
+        profilePicture: Yup.mixed()
+            .required('Profile picture is required')
+            .test(
+                'isStringOrFile',
+                'File size should be less than 5 MB',
+                (value) => {
+                    if (typeof value === 'string') {
+                        // Check if it's a valid file path (ends with an image extension)
+                        return /^(uploads\\userProfile\\.*\.(jpg|jpeg|png|gif))$/i.test(value);
+                    }
+                    if (value instanceof File) {
+                        // Check if it's a file and its size
+                        return value.size <= 5 * 1024 * 1024;
+                    }
+                    return false;
+                }
+            ),
         phone: Yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile is required'),
         role: Yup.string().required('Role is required'),
         country: Yup.string().required('Country is required'),
         state: Yup.string().required('State is required'),
-        district: Yup.string().required('District is required'),
+        city: Yup.string().required('City is required'),
         email: Yup.string().email('Invalid email address').required('Email is required'),
         password: editItem?.isEdit ? Yup.string() : Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
         confirmPassword: editItem?.isEdit ? Yup.string() : Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
@@ -48,9 +62,9 @@ function CreateUser() {
             password: '',
             email: '',
             role: '',
-            country: '',
-            state: '',
-            district: '',
+            country: 'IN',
+            state: 'KL',
+            city: '',
             confirmPassword: '',
             profilePicture: ''
         },
@@ -72,6 +86,9 @@ function CreateUser() {
         },
     });
 
+    console.log(formik.values.profilePicture);
+
+
 
     useEffect(() => {
         fetchDropdownData()
@@ -80,13 +97,13 @@ function CreateUser() {
     const fetchDropdownData = async () => {
         try {
             const [roleRes, countryRes] = await Promise.all([getRoles(), getCountry()]);
-    
+
             if (roleRes.status === 200) {
                 setRoleData(roleRes.data);
             } else {
                 console.warn('Failed to fetch roles:', roleRes.status);
             }
-    
+
             if (countryRes.status === 200) {
                 const updatedData = countryRes?.data?.map((item) => ({
                     value: item.iso2,
@@ -96,19 +113,17 @@ function CreateUser() {
             } else {
                 console.warn('Failed to fetch countries:', countryRes.status);
             }
-    
+
         } catch (error) {
             console.error("Error fetching dropdown data:", error);
         }
     };
 
-
-    const fetchState= async ()=>{
+    const fetchState = async () => {
         try {
             const res = await getState(formik.values.country)
 
             if (res.status === 200) {
-
                 const updatedData = res?.data?.map((item) => {
                     return {
                         value: item.iso2,
@@ -123,14 +138,11 @@ function CreateUser() {
         }
     }
 
-    const fetchCity= async ()=>{
+    const fetchCity = async () => {
         try {
-            const res = await getCity(formik.values.country , formik.values.state)
+            const res = await getCity(formik.values.country, formik.values.state)
 
             if (res.status === 200) {
-
-                console.log("city",res);
-                
                 const updatedData = res?.data?.map((item) => {
                     return {
                         value: item.name,
@@ -153,7 +165,7 @@ function CreateUser() {
             fetchCity();
         }
     }, [formik.values.country, formik.values.state]);
-    
+
 
     const getUserData = useCallback(async () => {
         if (!viewItem?.id && !editItem?.id) {
@@ -176,7 +188,7 @@ function CreateUser() {
                     role: data.role || '',
                     country: data.country || '',
                     state: data.state || '',
-                    district: data.district || '',
+                    city: data.city || '',
                     profilePicture: data.profilePicture || ''
                 });
 
@@ -207,11 +219,29 @@ function CreateUser() {
         setIsSubmitting(true)
 
         try {
-            const response = await createUser(formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
+
+            let response
+            // const response = await createUser(formData, {
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data',
+            //     }
+            // });
+
+
+
+            response = editItem.isEdit
+                // ? response = await axios.put(`http://localhost:5000/user/updateUser/${editItem.id}`, formData, {
+                //     headers: {
+                //         'Content-Type': 'multipart/form-data',
+                //     },
+                // })
+
+                ? await editUser(editItem.id, formData)
+                : await createUser(formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
 
             console.log('Full response:', response);
 
@@ -227,7 +257,7 @@ function CreateUser() {
             }
 
         } catch (error) {
-            Error(error.message);
+            Error(`Failed to ${editItem.isEdit ? 'update' : 'create'} user`);
         } finally {
             setIsSubmitting(false)
             setIsLoading(false);
@@ -290,7 +320,7 @@ function CreateUser() {
 
                         <div className="flex w-full mt-4">
                             <SelectInput
-                                disabled={viewItem.isView}
+                                disabled
                                 required
                                 label="Country"
                                 placeholder="Select country"
@@ -303,7 +333,7 @@ function CreateUser() {
                                 data={countryData}
                             />
                             <SelectInput
-                                disabled={viewItem.isView}
+                                disabled
                                 required
                                 className="mx-2"
                                 label="State"
@@ -319,14 +349,14 @@ function CreateUser() {
                             <SelectInput
                                 disabled={viewItem.isView}
                                 required
-                                label="District"
-                                placeholder="Select District"
+                                label="City"
+                                placeholder="Select City"
                                 width="w-1/3"
-                                name="district"
-                                value={formik.values.district}
+                                name="city"
+                                value={formik.values.city}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                error={formik.touched.district && formik.errors.district}
+                                error={formik.touched.city && formik.errors.city}
                                 data={cityData}
                             />
                         </div>
@@ -379,7 +409,11 @@ function CreateUser() {
 
                         <div className="flex w-full mt-4 justify-center">
                             <Save className="mr-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
-                            <Reset className="ml-1" type="reset" onClick={formik.handleReset} disabled={isSubmitting} />
+                            <Reset className="ml-1" type="reset" disabled={isSubmitting}
+                                onClick={() => {
+                                    formik.handleReset(); // Resets the form fields
+                                    setImageFile(null); // Resets the form state to initialValues
+                                }} />
                         </div>
                     </form>
                 </div>
