@@ -24,6 +24,7 @@ function CreateUser() {
     const [countryData, setCountryData] = useState([]);
     const [stateData, setStateData] = useState([]);
     const [cityData, setCityData] = useState([]);
+    const [resetTrigger, setResetTrigger] = useState(false);
 
 
     const validationSchema = Yup.object({
@@ -35,11 +36,9 @@ function CreateUser() {
                 'File size should be less than 5 MB',
                 (value) => {
                     if (typeof value === 'string') {
-                        // Check if it's a valid file path (ends with an image extension)
                         return /^(uploads\\userProfile\\.*\.(jpg|jpeg|png|gif))$/i.test(value);
                     }
                     if (value instanceof File) {
-                        // Check if it's a file and its size
                         return value.size <= 5 * 1024 * 1024;
                     }
                     return false;
@@ -85,10 +84,6 @@ function CreateUser() {
             handleSubmit(event, formData);
         },
     });
-
-    console.log(formik.values.profilePicture);
-
-
 
     useEffect(() => {
         fetchDropdownData()
@@ -177,7 +172,6 @@ function CreateUser() {
         try {
             const response = await viewUser(viewItem.id || editItem?.id);
 
-
             if (response.status === 200) {
                 const data = response.data;
                 formik.setValues({
@@ -221,21 +215,8 @@ function CreateUser() {
         try {
 
             let response
-            // const response = await createUser(formData, {
-            //     headers: {
-            //         'Content-Type': 'multipart/form-data',
-            //     }
-            // });
-
-
 
             response = editItem.isEdit
-                // ? response = await axios.put(`http://localhost:5000/user/updateUser/${editItem.id}`, formData, {
-                //     headers: {
-                //         'Content-Type': 'multipart/form-data',
-                //     },
-                // })
-
                 ? await editUser(editItem.id, formData)
                 : await createUser(formData, {
                     headers: {
@@ -267,6 +248,13 @@ function CreateUser() {
     const handleImageSelect = (file) => {
         setImageFile(file);
         formik.setFieldValue('profilePicture', file);
+    };
+
+
+    const handleFormReset = () => {
+        formik.handleReset();
+        setImageFile(null);
+        setResetTrigger((prev) => !prev);
     };
 
 
@@ -376,50 +364,52 @@ function CreateUser() {
                             />
                         </div>
 
-                        <div className="flex w-full mt-4">
-                            <TextInput
-                                disabled={viewItem.isView}
-                                required
-                                label="Password"
-                                placeholder="Enter password"
-                                width="w-1/2"
-                                name="password"
-                                type="password"
-                                className="mr-1"
-                                value={formik.values.password}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.password && formik.errors.password}
-                            />
-                            <TextInput
-                                disabled={viewItem.isView}
-                                required
-                                className="ml-1"
-                                label="Confirm Password"
-                                placeholder="Enter confirm password"
-                                width="w-1/2"
-                                name="confirmPassword"
-                                type="password"
-                                value={formik.values.confirmPassword}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                            />
-                        </div>
+                        {!editItem.isEdit && (
+
+                            <div className="flex w-full mt-4">
+                                <TextInput
+                                    disabled={viewItem.isView}
+                                    required
+                                    label="Password"
+                                    placeholder="Enter password"
+                                    width="w-1/2"
+                                    name="password"
+                                    type="password"
+                                    className="mr-1"
+                                    value={formik.values.password}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.password && formik.errors.password}
+                                />
+                                <TextInput
+                                    disabled={viewItem.isView}
+                                    required
+                                    className="ml-1"
+                                    label="Confirm Password"
+                                    placeholder="Enter confirm password"
+                                    width="w-1/2"
+                                    name="confirmPassword"
+                                    type="password"
+                                    value={formik.values.confirmPassword}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                                />
+                            </div>
+
+                        )}
 
                         <div className="flex w-full mt-4 justify-center">
                             <Save className="mr-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
                             <Reset className="ml-1" type="reset" disabled={isSubmitting}
-                                onClick={() => {
-                                    formik.handleReset(); // Resets the form fields
-                                    setImageFile(null); // Resets the form state to initialValues
-                                }} />
+                                onClick={handleFormReset} />
                         </div>
                     </form>
                 </div>
 
                 <div className="w-1/5">
                     <ImageUpload
+                        resetTrigger={resetTrigger}
                         disabled={viewItem.isView}
                         initialImage={formik.values.profilePicture}
                         onBlur={formik.handleBlur}

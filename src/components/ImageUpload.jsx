@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
-function ImageUpload({ className, label, required = false, error, onImageSelect, name, onBlur, initialImage, disabled }) {
+function ImageUpload({
+    className,
+    label,
+    required = false,
+    error,
+    onImageSelect,
+    name,
+    onBlur,
+    initialImage,
+    disabled,
+    resetTrigger
+}) {
     const [selectedImage, setSelectedImage] = useState(null);
     const serverUrl = import.meta.env.VITE_API_URL;
 
@@ -9,6 +20,8 @@ function ImageUpload({ className, label, required = false, error, onImageSelect,
             setSelectedImage(`${serverUrl}/${initialImage}`);
         }
     }, [initialImage]);
+
+
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -24,16 +37,22 @@ function ImageUpload({ className, label, required = false, error, onImageSelect,
         }
     };
 
-    const imageUrl = selectedImage ? selectedImage : initialImage ? `${serverUrl}${initialImage}` : null;
+    var imageUrl = selectedImage ? selectedImage : initialImage ? `${serverUrl}${initialImage}` : null;
+
+    useEffect(() => {
+        if (resetTrigger) {
+            setSelectedImage(null);
+            imageUrl = null
+        }
+    }, [resetTrigger]);
 
     return (
         <>
-            <label className='text-white mb-1 ms-2'>
-                {label} {required && <span className='text-red-500'>*</span>}
+            <label className="text-white mb-1 ms-2">
+                {label} {required && <span className="text-red-500">*</span>}
             </label>
-            <div 
+            <div
                 className={`rounded-md h-44 shadow-md mt-1 ${className} ${disabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed bg-opacity-85' : 'bg-gray-50 bg-black'}`}
-                disabled={disabled}
             >
                 <label htmlFor="upload" className="flex flex-col items-center cursor-pointer">
                     {imageUrl ? (
@@ -42,14 +61,14 @@ function ImageUpload({ className, label, required = false, error, onImageSelect,
                         <p className={`mt-20 ${disabled ? 'text-gray-500' : ''}`}>Choose File</p>
                     )}
                 </label>
-                <input 
-                    id="upload" 
-                    type="file" 
-                    name={name} 
-                    className="hidden" 
-                    onChange={handleImageChange} 
-                    onBlur={onBlur} 
-                    disabled={disabled} 
+                <input
+                    id="upload"
+                    type="file"
+                    name={name}
+                    className="hidden"
+                    onChange={handleImageChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
                 />
             </div>
             <p className="p-0 m-0 text-red-600 font-normal text-end">{error}</p>
