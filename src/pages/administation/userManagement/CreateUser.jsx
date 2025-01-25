@@ -400,9 +400,10 @@ function CreateUser() {
                         )}
 
                         <div className="flex w-full mt-4 justify-center">
-                            <Save className="mr-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
-                            <Reset className="ml-1" type="reset" disabled={isSubmitting}
+                            <Reset className="me-1" type="reset" disabled={isSubmitting}
                                 onClick={handleFormReset} />
+                            <Save className="ms-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
+
                         </div>
                     </form>
                 </div>

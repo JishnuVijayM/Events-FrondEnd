@@ -11,6 +11,7 @@ import Authentication from '../administation/authentication/authentication';
 import {  viewRole } from '../../service/api/api';
 import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlice';
 import { setActiveTab } from '../../redux/tabContents/tabSlice';
+import CompanyManagement from '../job/company/CompanyManagement';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -137,7 +138,7 @@ const Index = () => {
                 {
                     id: 'company-management',
                     name: 'Company Management',
-                    href: '/home/company',
+                    href: '/admin/company-management',
                     permissionModule: 'companyManagement'
                 },
                 {
@@ -388,6 +389,7 @@ const Index = () => {
                     <Route path="role-management" element={<RoleManagement />} />
                     <Route path="user-management" element={<UserManagement />} />
                     <Route path="authentication" element={<Authentication />} />
+                    <Route path="company-management" element={<CompanyManagement />} />
                 </Routes>
             </main>
         </>

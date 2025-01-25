@@ -34,24 +34,28 @@ function Login() {
             setSubmitting(true);
             localStorage.clear();
             dispatch(handleClearPermission());
-    
+
             const response = await login(values);
-    
+
             if (response?.status === 200) {
                 const { role, token } = response.data;
-    
+
                 if (role && token) {
                     localStorage.setItem('token', token);
                     localStorage.setItem('id', role);
                     dispatch(setRoleId(role));
-    
+
                     // Fetch permissions
                     const permissionResponse = await viewRole(role);
-    
+
+                    console.log('permissionResponse', permissionResponse);
+
+
                     if (permissionResponse?.status === 200) {
                         dispatch(handleAddPermissions(permissionResponse.data.permissions));
                         Success('Login successful!');
-                        navigate('admin');
+                        navigate('/admin');
+
                     } else {
                         handleFetchError(permissionResponse);
                     }
@@ -69,24 +73,24 @@ function Login() {
             setSubmitting(false);
         }
     };
-    
+
     const handleError = (status, setErrors) => {
         const errorMessages = {
             400: 'Invalid input or missing fields',
             401: 'Invalid credentials',
             default: 'Login failed. Please try again later.'
         };
-    
+
         const message = errorMessages[status] || errorMessages.default;
         setErrors({ email: message });
         Warning(message);
     };
-    
+
     const handleFetchError = (response) => {
         Error('Failed to fetch permissions');
         console.error('Permission fetch error:', response);
     };
-    
+
 
     return (
         <div className="flex-1 bg-white w-full h-full flex items-center justify-between flex-col p-6">

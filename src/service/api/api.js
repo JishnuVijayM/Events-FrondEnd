@@ -138,3 +138,21 @@ export const editUser = async (id, data) => {
         return error;
     }
 };
+
+//company
+export const createCompany = async (data) => {
+    try {
+        const res = await axiosInstance.post(
+            `/company/createCompany`,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

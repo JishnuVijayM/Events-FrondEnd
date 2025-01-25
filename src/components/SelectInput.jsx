@@ -4,7 +4,7 @@ function SelectInput({ className, label = 'Option', onChange, value = '', disabl
 
 
     return (
-        <div className={`flex flex-col ${width}`}>
+        <div className={`flex flex-col ${width} ${className}`}>
             <label className='text-white mb-1'>
                 {label} {required && <span className='text-red-500'>*</span>}
             </label>
@@ -15,7 +15,7 @@ function SelectInput({ className, label = 'Option', onChange, value = '', disabl
                 value={value}
                 onChange={onChange}
                 disabled={disabled}
-                className={`${className} p-2 pr-8 rounded outline-none bg-black text-gray-400 disabled:cursor-not-allowed focus:shadow-none disabled:text-slate-400`}
+                className={` p-2 pr-8 rounded outline-none bg-black text-gray-400 disabled:cursor-not-allowed focus:shadow-none disabled:text-slate-400`}
             >
                 <option value="" className='text-slate-400'>
                     Choose a {(label || 'option').toLowerCase()}

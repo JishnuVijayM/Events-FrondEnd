@@ -10,7 +10,8 @@ function ImageUpload({
     onBlur,
     initialImage,
     disabled,
-    resetTrigger
+    resetTrigger,
+    placeholder
 }) {
     const [selectedImage, setSelectedImage] = useState(null);
     const serverUrl = import.meta.env.VITE_API_URL;
@@ -58,7 +59,7 @@ function ImageUpload({
                     {imageUrl ? (
                         <img src={imageUrl} alt="Selected" className={`h-44 w-full pb-1 object-cover rounded-md ${disabled ? 'opacity-70' : ''}`} />
                     ) : (
-                        <p className={`mt-20 ${disabled ? 'text-gray-500' : ''}`}>Choose File</p>
+                        <p className={`mt-20 ${disabled ? 'text-gray-500' : ''}`}> {placeholder ? placeholder : 'Choose File'}</p>
                     )}
                 </label>
                 <input
