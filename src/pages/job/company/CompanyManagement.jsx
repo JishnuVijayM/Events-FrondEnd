@@ -1,19 +1,19 @@
 import React from 'react'
 import PageLayout from '../../layout/PageLayout';
-import { getAllUser } from '../../../service/api/api';
+import { getAllCompanies } from '../../../service/api/api';
 import CreateCompany from './CreateCompany';
 
 const CompanyManagement = () => {
 
     const columnHeaders = [
         { key: 'no', label: 'NO', size: 50 },
-        { key: 'name', label: 'NAME', size: 100 },
-        { key: 'role', label: 'ROLE', size: 100 },
-        { key: 'mobile', label: 'MOBILE', size: 100 },
-        { key: 'email', label: 'EMAIL', size: 100 },
-        { key: 'updated-by', label: 'UPDATED BY', size: 100 },
-        { key: 'last-login', label: 'LAST LOGIN', size: 100 },
-        { key: 'last-updated', label: 'LAST UPDATED', size: 100 },
+        { key: 'company name', label: 'COMPANY NAME', size: 100 },
+        { key: 'industry', label: 'INDUSTRY', size: 70 },
+        { key: 'recruitment event', label: 'RECRUITMENT EVENT', size: 100 },
+        { key: 'job position', label: 'JOB POSITION', size: 100 },
+        { key: 'candidates applied', label: 'CANDIDATES APPLIED', size: 10 },
+        { key: 'event date', label: 'EVENT DATE', size: 100 },
+        { key: 'status', label: 'STATUS', size: 50 },
     ];
 
 
@@ -21,7 +21,7 @@ const CompanyManagement = () => {
         <>
             <PageLayout
                 pageType="company"
-                fetchData={getAllUser}
+                fetchData={getAllCompanies}
                 columnHeaders={columnHeaders}
                 addComponent={<CreateCompany/>}
                 pathIdentifier="company-management"

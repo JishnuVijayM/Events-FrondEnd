@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import TextInput from '../../../components/TextInput';
@@ -6,15 +6,20 @@ import SelectInput from '../../../components/SelectInput';
 import TextArea from '../../../components/TextArea';
 import ImageUpload from '../../../components/ImageUpload';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCompany } from '../../../service/api/api';
+import { createCompany, viewCompany } from '../../../service/api/api';
 import { Error, Success, Warning } from '../../../components/Notification';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
+import Reset from '../../../components/Reset';
+import Save from '../../../components/Save';
 
 function CreateCompany() {
     const [imageFile, setImageFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const { viewItem, editItem } = useSelector((state) => state.tabContent);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [resetTrigger, setResetTrigger] = useState(false);
+
 
     const validationSchema = Yup.object({
         companyName: Yup.string()
@@ -71,7 +76,6 @@ function CreateCompany() {
             }),
     });
 
-
     const form = useFormik({
         initialValues: {
             companyName: '',
@@ -106,6 +110,54 @@ function CreateCompany() {
             handleSubmit(event, formData);
         },
     });
+
+    const getCompanyData = useCallback(async () => {
+        if (!viewItem?.id && !editItem?.id) {
+            Warning('ID is required');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await viewCompany(viewItem.id || editItem?.id);
+
+            if (response.status === 200) {
+                const data = response.data;
+                form.setValues({
+                    companyName: data.companyName || '',
+                    industry: data.industry || '',
+                    companyAddress: data.companyAddress || '',
+                    country: data.country || '',
+                    state: data.state || '',
+                    city: data.city || '',
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    password: '',
+                    jobPosition: data.jobPosition || '',
+                    vacancy: data.vacancy || '',
+                    eventName: data.eventName || '',
+                    companyLogo: data.companyLogo || null,
+                });
+
+            } else {
+                dispatch(setActiveTab("list"));
+                Error(response.data?.message || 'Unexpected error occurred');
+                console.error('Error fetching company details:');
+            }
+        } catch (error) {
+            dispatch(setActiveTab("list"));
+            Error(error.message || 'Failed to fetch company details');
+            console.error('Error fetching company:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [viewItem?.id, editItem?.id]);
+
+    useEffect(() => {
+        if ((viewItem?.id && (viewItem.isView || viewItem.isEdit)) || (editItem?.id && (editItem.isView || editItem.isEdit))) {
+            getCompanyData();
+        }
+    }, [viewItem, editItem]);
 
     const handleSubmit = async (event, formData) => {
         event.preventDefault();
@@ -146,8 +198,12 @@ function CreateCompany() {
     };
 
     const handleImageSelect = (file) => {
-        // setImageFile(file);
         form.setFieldValue('companyLogo', file)
+    };
+
+    const handleFormReset = () => {
+        form.handleReset();
+        setResetTrigger((prev) => !prev);
     };
 
     return (
@@ -156,6 +212,7 @@ function CreateCompany() {
                 {/* First Row */}
                 <div className="flex w-full">
                     <TextInput
+                        disabled={viewItem.isView}
                         required
                         label="Company name"
                         placeholder="Enter company name"
@@ -168,6 +225,7 @@ function CreateCompany() {
                     />
 
                     <SelectInput
+                        disabled={viewItem.isView}
                         className="mx-2"
                         required
                         label="Industry"
@@ -184,6 +242,7 @@ function CreateCompany() {
                     />
 
                     <TextArea
+                        disabled={viewItem.isView}
                         required
                         label="Company Address"
                         placeholder="Enter company address"
@@ -199,6 +258,7 @@ function CreateCompany() {
                 {/* Second Row */}
                 <div className="flex w-full mt-2">
                     <SelectInput
+                        disabled={viewItem.isView}
                         required
                         label="Country"
                         placeholder="Select country"
@@ -213,6 +273,7 @@ function CreateCompany() {
                     />
 
                     <SelectInput
+                        disabled={viewItem.isView}
                         className="mx-2"
                         required
                         label="State"
@@ -228,6 +289,7 @@ function CreateCompany() {
                     />
 
                     <SelectInput
+                        disabled={viewItem.isView}
                         required
                         label="City"
                         placeholder="Select city"
@@ -245,6 +307,7 @@ function CreateCompany() {
                 {/* Third Row */}
                 <div className="flex w-full mt-2">
                     <TextInput
+                        disabled={viewItem.isView}
                         required
                         label="Email"
                         placeholder="Enter email"
@@ -258,6 +321,7 @@ function CreateCompany() {
                     />
 
                     <TextInput
+                        disabled={viewItem.isView}
                         required
                         label="Phone"
                         placeholder="Enter phone"
@@ -274,6 +338,7 @@ function CreateCompany() {
                 {/* Fourth Row */}
                 <div className="flex w-full mt-2">
                     <TextInput
+                        disabled={viewItem.isView}
                         required
                         label="Password"
                         placeholder="Enter password"
@@ -288,6 +353,7 @@ function CreateCompany() {
                     />
 
                     <TextInput
+                        disabled={viewItem.isView}
                         required
                         label="Confirm Password"
                         placeholder="Enter confirm password"
@@ -305,6 +371,7 @@ function CreateCompany() {
                 {/* Fifth Row */}
                 <div className="flex w-full mt-2">
                     <SelectInput
+                        disabled={viewItem.isView}
                         required
                         label="Job Position"
                         placeholder="Select position"
@@ -320,6 +387,7 @@ function CreateCompany() {
                     />
 
                     <TextInput
+                        disabled={viewItem.isView}
                         required
                         label="Vacancy"
                         placeholder="Enter Vacancy"
@@ -334,7 +402,7 @@ function CreateCompany() {
                     />
 
                     <SelectInput
-                        //disabled={viewItem.isView}
+                        disabled={viewItem.isView}
                         required
                         label="Event Name"
                         placeholder="Select event"
@@ -351,18 +419,19 @@ function CreateCompany() {
                 </div>
 
                 {/* Submit Button */}
-                <div className="flex w-full mt-2">
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                        Submit
-                    </button>
+                <div className="flex w-full mt-4 justify-center">
+                    <Reset className="me-1" type="reset" disabled={isSubmitting || viewItem.isView}
+                        onClick={handleFormReset} />
+                    <Save className="ms-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
+
                 </div>
             </div>
 
             {/* Profile Picture */}
             <div className="w-1/6 ms-2">
-
-
                 <ImageUpload
+                    resetTrigger={resetTrigger}
+                    disabled={viewItem.isView}
                     initialImage={form.values.companyLogo}
                     label="Profile Picture"
                     required

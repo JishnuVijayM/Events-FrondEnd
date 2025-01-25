@@ -400,7 +400,7 @@ function CreateUser() {
                         )}
 
                         <div className="flex w-full mt-4 justify-center">
-                            <Reset className="me-1" type="reset" disabled={isSubmitting}
+                            <Reset className="me-1" type="reset" disabled={isSubmitting || viewItem.isView}
                                 onClick={handleFormReset} />
                             <Save className="ms-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
 
@@ -414,8 +414,12 @@ function CreateUser() {
                         disabled={viewItem.isView}
                         initialImage={formik.values.profilePicture}
                         onBlur={formik.handleBlur}
-                        error={formik.touched.profilePicture && formik.errors.profilePicture} label="Profile Picture"
-                        required className="ml-2" name={'profilePicture'} onImageSelect={handleImageSelect} />
+                        error={formik.touched.profilePicture && formik.errors.profilePicture}
+                        label="Profile Picture"
+                        required
+                        className="ml-2"
+                        name={'profilePicture'}
+                        onImageSelect={handleImageSelect} />
                 </div>
 
             </div>

@@ -156,3 +156,21 @@ export const createCompany = async (data) => {
         return error;
     }
 };
+
+export const getAllCompanies = async () => {
+    try {
+        const res = await axiosInstance.get(`/company/getCompanies`)
+        return res.data
+    } catch (error) {
+        return error
+    }
+}
+
+export const viewCompany = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/company/viewCompany/${id}`)
+        return res
+    } catch (error) {
+        return error
+    }
+}

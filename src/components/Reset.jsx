@@ -7,7 +7,7 @@ function Reset({ onClick, label, className, disabled }) {
         <button
             disabled={disabled}
             onClick={onClick}
-            className={`${className} cursor-pointer border hover:bg-stone-600 border-white text-white h-10 w-20 px-3 rounded-md disabled:cursor-not-allowed disabled:bg-red-300 disabled:text-slate-800`}
+            className={`${className} cursor-pointer border hover:bg-stone-600 border-white text-white h-10 w-20 px-3 rounded-md disabled:cursor-not-allowed`}
         >
             <div className="flex justify-center items-center">
                 {label ? label : "Reset"} <FontAwesomeIcon className='text-primary ps-2 ' icon={faRotateLeft} />
