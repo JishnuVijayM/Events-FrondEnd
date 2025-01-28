@@ -15,8 +15,6 @@ const Tab = ({ tabs, tabContent }) => {
 
     const getPermissionModule = (page) => {
 
-        console.log('page', page);
-
         if (!page) return '';
         return page
             .split('-')
@@ -28,8 +26,6 @@ const Tab = ({ tabs, tabContent }) => {
 
     const getModulePermissions = () => {
         const module = getPermissionModule(currentPage);
-        console.log('currentPage', currentPage);
-        console.log('module', module);
 
         if (!module || !permissions?.[0]) return null;
 
@@ -42,10 +38,7 @@ const Tab = ({ tabs, tabContent }) => {
         return null;
     };
 
-    const modulePermissions = getModulePermissions();
-
-    console.log('modulePermissions',modulePermissions);
-    
+    const modulePermissions = getModulePermissions();    
 
     const toTitleCase = (str) => {
         return str

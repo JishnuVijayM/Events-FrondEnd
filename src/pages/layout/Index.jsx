@@ -8,7 +8,7 @@ import Dashboard from '../dashboard/Index';
 import RoleManagement from '../administation/roleManagement/RoleManagement';
 import UserManagement from '../administation/userManagement/UserManagement';
 import Authentication from '../administation/authentication/authentication';
-import {  viewRole } from '../../service/api/api';
+import { viewRole } from '../../service/api/api';
 import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlice';
 import { setActiveTab } from '../../redux/tabContents/tabSlice';
 import CompanyManagement from '../job/company/CompanyManagement';
@@ -30,7 +30,6 @@ const Index = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
-
     const handleFetchPermission = async () => {
 
         const roleId = localStorage.getItem('id')
@@ -46,7 +45,7 @@ const Index = () => {
 
             if (response.status === 200) {
                 dispatch(handleAddPermissions(response?.data.permissions))
-            } 
+            }
         } catch (error) {
             console.log("permission error", error);
         }
@@ -58,27 +57,28 @@ const Index = () => {
 
         function mapMenuItems(menuItems) {
             const menuMapping = {};
-        
+
+
             menuItems.forEach(item => {
                 menuMapping[item.id] = item.name;
-        
+
                 if (item.subMenu && item.subMenu.length > 0) {
                     item.subMenu.forEach(subItem => {
                         menuMapping[subItem.id] = subItem.name;
                     });
                 }
             });
-        
+
             return menuMapping;
         }
 
         const menuMapping = mapMenuItems(menuItems);
-    
+
         setSelectedMenu(menuMapping[lastSegment] || 'Dashboard');
-    
+
         handleFetchPermission();
     }, [pathname]);
-   
+
     const hasPermission = (menuId, subModule = null) => {
         if (!permissions || !permissions[0]) return false;
 
@@ -143,7 +143,7 @@ const Index = () => {
                     permissionModule: 'companyManagement'
                 },
                 {
-                    id: 'job-openings',
+                    id: 'job-management',
                     name: 'Job Openings',
                     href: '/admin/job-management',
                     permissionModule: 'jobManagement'
@@ -257,6 +257,8 @@ const Index = () => {
     const handleLogout = () => {
         alert('logout');
     };
+
+
 
     return (
         <>
