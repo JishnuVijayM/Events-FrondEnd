@@ -364,7 +364,7 @@ function CreateUser() {
                             />
                         </div>
 
-                        {!editItem.isEdit && (
+                        {!editItem.isEdit && !viewItem.isView && (
 
                             <div className="flex w-full mt-4">
                                 <TextInput

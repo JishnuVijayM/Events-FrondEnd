@@ -14,6 +14,9 @@ const Tab = ({ tabs, tabContent }) => {
     const currentPage = pathname?.split('/')[2] || '';
 
     const getPermissionModule = (page) => {
+
+        console.log('page', page);
+
         if (!page) return '';
         return page
             .split('-')
@@ -25,6 +28,9 @@ const Tab = ({ tabs, tabContent }) => {
 
     const getModulePermissions = () => {
         const module = getPermissionModule(currentPage);
+        console.log('currentPage', currentPage);
+        console.log('module', module);
+
         if (!module || !permissions?.[0]) return null;
 
         for (const section of Object.values(permissions[0])) {
@@ -37,6 +43,9 @@ const Tab = ({ tabs, tabContent }) => {
     };
 
     const modulePermissions = getModulePermissions();
+
+    console.log('modulePermissions',modulePermissions);
+    
 
     const toTitleCase = (str) => {
         return str

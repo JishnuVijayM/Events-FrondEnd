@@ -174,3 +174,20 @@ export const viewCompany = async (id) => {
         return error
     }
 }
+
+export const editCompany = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/company/updateCompany/${id}`,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

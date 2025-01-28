@@ -21,6 +21,7 @@ const PageLayout = ({
         const fetchPageData = async () => {
             // Remove the pathname check or make it less strict if needed
             if (!pathname.includes(pathIdentifier)) {
+                alert('w')
                 return;
             }
 

@@ -18,7 +18,7 @@ const initialPermissions = {
     ],
     jobManagement: [
         { module: 'companyManagement', read: false, add: false, edit: false, delete: false },
-        { module: 'job', read: false, add: false, edit: false, delete: false },
+        { module: 'jobManagement', read: false, add: false, edit: false, delete: false },
         { module: 'candidateManagement', read: false, edit: false },
     ],
     eventManagement: [

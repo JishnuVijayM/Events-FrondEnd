@@ -12,6 +12,7 @@ import {  viewRole } from '../../service/api/api';
 import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlice';
 import { setActiveTab } from '../../redux/tabContents/tabSlice';
 import CompanyManagement from '../job/company/CompanyManagement';
+import JobOpenings from '../job/jobOpenings/JobOpenings';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -144,8 +145,8 @@ const Index = () => {
                 {
                     id: 'job-openings',
                     name: 'Job Openings',
-                    href: '/home/job-openings',
-                    permissionModule: 'job'
+                    href: '/admin/job-management',
+                    permissionModule: 'jobManagement'
                 },
                 {
                     id: 'candidate-list',
@@ -390,6 +391,7 @@ const Index = () => {
                     <Route path="user-management" element={<UserManagement />} />
                     <Route path="authentication" element={<Authentication />} />
                     <Route path="company-management" element={<CompanyManagement />} />
+                    <Route path="job-management" element={<JobOpenings />} />
                 </Routes>
             </main>
         </>
