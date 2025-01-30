@@ -14,7 +14,6 @@ import Save from '../../../components/Save';
 import Loader from '../../../components/Loader';
 
 function CreateCompany() {
-    const [imageFile, setImageFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const { viewItem, editItem } = useSelector((state) => state.tabContent);
@@ -340,7 +339,7 @@ function CreateCompany() {
                             className="mx-2"
                             required
                             label="Industry"
-                            placeholder="Select industry"
+                            placeholder="industry"
                             width="w-1/3"
                             name="industry"
                             value={form.values.industry}
@@ -370,7 +369,7 @@ function CreateCompany() {
                             disabled
                             required
                             label="Country"
-                            placeholder="Select country"
+                            placeholder="country"
                             width="w-1/3"
                             name="country"
                             value={form.values.country}
@@ -385,7 +384,7 @@ function CreateCompany() {
                             className="mx-2"
                             required
                             label="State"
-                            placeholder="Select state"
+                            placeholder="state"
                             width="w-1/3"
                             name="state"
                             value={form.values.state}
@@ -399,7 +398,7 @@ function CreateCompany() {
                             disabled={viewItem.isView}
                             required
                             label="City"
-                            placeholder="Select city"
+                            placeholder="city"
                             width="w-1/3"
                             name="city"
                             value={form.values.city}
@@ -484,7 +483,7 @@ function CreateCompany() {
                             disabled={viewItem.isView}
                             required
                             label="Job Position"
-                            placeholder="Select position"
+                            placeholder="position"
                             width="w-1/3"
                             name="jobPosition"
                             value={form.values.jobPosition}
@@ -514,7 +513,7 @@ function CreateCompany() {
                             disabled={viewItem.isView}
                             required
                             label="Event Name"
-                            placeholder="Select event"
+                            placeholder="event"
                             width="w-1/3"
                             name="eventName"
                             value={form.values.eventName}
@@ -531,7 +530,7 @@ function CreateCompany() {
                     <div className="flex w-full mt-4 justify-center">
                         <Reset className="me-1" type="reset" disabled={isSubmitting || viewItem.isView}
                             onClick={handleFormReset} />
-                        <Save className="ms-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView} />
+                        <Save className="ms-1" label={editItem.isEdit ? "Update" : "Save"} type="submit" disabled={isSubmitting || viewItem.isView || !form.dirty} />
 
                     </div>
                 </div>

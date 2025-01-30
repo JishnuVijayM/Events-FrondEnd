@@ -16,7 +16,7 @@ import JobOpenings from '../job/jobOpenings/JobOpenings';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-        <span className="text-sm font-semibold text-gray-700">Super Man</span>
+        <span className="text-sm font-semibold text-black">Super Man</span>
     </div>
 );
 

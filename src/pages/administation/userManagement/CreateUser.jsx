@@ -295,7 +295,7 @@ function CreateUser() {
                                 disabled={viewItem.isView}
                                 required
                                 label="Role"
-                                placeholder="Select role"
+                                placeholder="role"
                                 width="w-1/3"
                                 name="role"
                                 value={formik.values.role}
@@ -311,7 +311,7 @@ function CreateUser() {
                                 disabled
                                 required
                                 label="Country"
-                                placeholder="Select country"
+                                placeholder="country"
                                 width="w-1/3"
                                 name="country"
                                 value={formik.values.country}
@@ -325,7 +325,7 @@ function CreateUser() {
                                 required
                                 className="mx-2"
                                 label="State"
-                                placeholder="Select State"
+                                placeholder="State"
                                 width="w-1/3"
                                 name="state"
                                 value={formik.values.state}
@@ -338,7 +338,7 @@ function CreateUser() {
                                 disabled={viewItem.isView}
                                 required
                                 label="City"
-                                placeholder="Select City"
+                                placeholder="City"
                                 width="w-1/3"
                                 name="city"
                                 value={formik.values.city}

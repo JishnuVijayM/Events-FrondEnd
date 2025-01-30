@@ -1,6 +1,6 @@
 import React from 'react';
 
-function SelectInput({ className, label = 'Option', onChange, value = '', disabled, error, width = 'w-1/3', data = [], required = false, onBlur, name }) {
+function SelectInput({ className, label = 'Option', onChange, value = '', disabled, error, width = 'w-1/3', data = [], required = false, onBlur, name,placeholder }) {
 
 
     return (
@@ -18,7 +18,7 @@ function SelectInput({ className, label = 'Option', onChange, value = '', disabl
                 className={` p-2 pr-8 rounded outline-none bg-black text-gray-400 disabled:cursor-not-allowed focus:shadow-none disabled:text-slate-400`}
             >
                 <option value="" className='text-slate-400'>
-                    Choose a {(label || 'option').toLowerCase()}
+                    Select a {(placeholder || 'option').toLowerCase()}
                 </option>
                 {data?.map((item) => (
                     <option key={item.value} value={item.value}>
