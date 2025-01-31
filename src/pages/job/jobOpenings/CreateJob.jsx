@@ -6,32 +6,63 @@ import SelectInput from '../../../components/SelectInput';
 import DateInput from '../../../components/DateInput';
 import Reset from '../../../components/Reset';
 import Save from '../../../components/Save';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import MultiSelectInput from '../../../components/MultiSelectInput';
+import { Error, Success, Warning } from '../../../components/Notification';
+import { createJob } from '../../../service/api/api';
+import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 
 const validationSchema = Yup.object({
-    jobTitle: Yup.string().required('Job Title is required'),
-    company: Yup.string().required('Company Name is required'),
-    location: Yup.string().required('Location is required'),
-    skill: Yup.string().required('Required Skill is required'),
-    salaryRange: Yup.string().required('Salary Range is required'),
-    employmentType: Yup.string().required('Employment Type is required'),
-    experience: Yup.string().required('Experience is required'),
-    eduLevel: Yup.string().required('Education Level is required'),
-    vacancy: Yup.number().required('Vacancy is required').positive('Vacancy must be a positive number').integer(),
-    deadline: Yup.date().required('Application Deadline is required'),
-    status: Yup.string().required('Job Status is required')
+    // jobTitle: Yup.string().required('Job Title is required'),
+    // company: Yup.string().required('Company Name is required'),
+    // location: Yup.string().required('Location is required'),
+    skill: Yup.array().min(1, 'At least one skill is required').required('Required Skill is required'),
+    // salaryRange: Yup.string().required('Salary Range is required'),
+    // employmentType: Yup.string().required('Employment Type is required'),
+    // experience: Yup.string().required('Experience is required'),
+    // eduLevel: Yup.string().required('Education Level is required'),
+    // vacancy: Yup.number().required('Vacancy is required').positive('Vacancy must be a positive number').integer(),
+    // deadline: Yup.date().required('Application Deadline is required'),
+    // status: Yup.string().required('Job Status is required')
 });
 
 function CreateJob() {
     const { viewItem, editItem } = useSelector((state) => state.tabContent);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+    const [skill, setSkill] = useState([
+        { label: "React", value: "react" },
+        { label: "Node.js", value: "nodejs" },
+        { label: "MongoDB", value: "mongodb" },
+        { label: "Docker", value: "docker" },
+    ]);
+    const [education, setEducation] = useState([
+        { label: "High School", value: "high_school" },
+        { label: "Associate's Degree", value: "associates_degree" },
+        { label: "Bachelor's Degree", value: "bachelors_degree" },
+        { label: "Master's Degree", value: "masters_degree" },
+        { label: "Other", value: "other" }
+    ]);
+    const [employementType, setEmploymentType] = useState([
+        { label: "Full-Time", value: "full_time" },
+        { label: "Part-Time", value: "part_time" },
+        { label: "Contract", value: "contract" },
+        { label: "Intern", value: "intern" },
+        { label: "Freelancer", value: "freelancer" },
+        { label: "Remote", value: "remote" },
+        { label: "Temporary", value: "temporary" },
+        { label: "Consultant", value: "consultant" },
+        { label: "Seasonal", value: "seasonal" }
+    ]);
+
 
     const form = useFormik({
         initialValues: {
             jobTitle: '',
             company: '',
             location: '',
-            skill: '',
+            skill: [],
             salaryRange: '',
             employmentType: '',
             experience: '',
@@ -41,10 +72,53 @@ function CreateJob() {
             status: 'Active'
         },
         validationSchema,
-        onSubmit: (values) => {
-            console.log('Form Data:', values);
+        onSubmit: async (values) => {
+
+            setIsLoading(true);
+            setIsSubmitting(true)
+
+            try {
+
+                let response
+
+                if (editItem.isEdit) {
+                    // response = await editUser(editItem.id, values); 
+                } else {
+                    response = await createJob(values);
+                }
+
+                console.log('Full response:', response);
+
+                if (response.status === 400) {
+                    Warning(response.response?.data?.message || 'An error occurred!');
+                    return;
+                }
+
+                if (response.status === 404) {
+                    Warning('An error occurred!');
+                    return;
+                }
+
+                if (response.status === 201) {
+                    Success(response.data.message);
+                    dispatch(setActiveTab("list"));
+                    return;
+                }
+
+            } catch (error) {
+                console.log('job e', error);
+
+                Error(`Failed to ${editItem.isEdit ? 'update' : 'create'} job`);
+            } finally {
+                setIsSubmitting(false)
+                setIsLoading(false);
+            }
+
         }
     });
+
+
+
 
     return (
         <form onSubmit={form.handleSubmit} className="w-full rounded-md bg-gray p-5">
@@ -91,18 +165,16 @@ function CreateJob() {
                     onBlur={form.handleBlur}
                     error={form.touched.location && form.errors.location}
                 />
-                <SelectInput
+                <MultiSelectInput
                     disabled={viewItem.isView}
                     required
                     label="Required Skill"
                     placeholder="Skill"
                     width="w-1/4"
                     name="skill"
-                    data={[{ label: "test", value: "test" },
-                    { label: "t1", value: "t1" }
-                    ]}
+                    data={skill}
                     value={form.values.skill}
-                    onChange={form.handleChange}
+                    onChange={(selectedSkills) => form.setFieldValue('skill', selectedSkills)}
                     onBlur={form.handleBlur}
                     error={form.touched.skill && form.errors.skill}
                 />
@@ -127,9 +199,7 @@ function CreateJob() {
                     placeholder="Type"
                     width="w-1/4"
                     name="employmentType"
-                    data={[{ label: "test", value: "test" },
-                    { label: "t1", value: "t1" }
-                    ]}
+                    data={employementType}
                     value={form.values.employmentType}
                     onChange={form.handleChange}
                     onBlur={form.handleBlur}
@@ -154,9 +224,7 @@ function CreateJob() {
                     placeholder="Level"
                     width="w-1/4"
                     name="eduLevel"
-                    data={[{ label: "test", value: "test" },
-                    { label: "t1", value: "t1" }
-                    ]}
+                    data={education}
                     value={form.values.eduLevel}
                     onChange={form.handleChange}
                     onBlur={form.handleBlur}

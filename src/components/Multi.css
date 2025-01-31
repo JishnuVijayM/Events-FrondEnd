@@ -1,0 +1,39 @@
+.multiselect {
+  background-color: black;
+  border-radius: 4px !important;
+  color: rgb(0, 0, 0) !important;
+}
+.multiselect:focus {
+  border: none !important;
+}
+
+.dropdown-container {
+  position: relative;
+  outline: 0;
+  border: none !important;
+  border-radius: 5px !important;
+  background-color: #000000 !important;
+  border: 1px solid var(--rmsc-border);
+  border-radius: var(--rmsc-radius);
+}
+
+.dropdown-heading-value {
+  color: white !important;
+}
+
+.dropdown-content {
+  background-color: black !important;
+}
+
+/* In Multi.css */
+.react-multiselect-component .react-multiselect-item input {
+    display: none;
+}
+
+.react-multiselect-component .react-multiselect-item .checkmark {
+    display: none;
+}
+
+.react-multiselect-component .react-multiselect-item {
+    padding-left: 20px; /* Adjust to align text properly */
+}

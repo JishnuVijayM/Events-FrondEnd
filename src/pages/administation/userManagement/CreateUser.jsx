@@ -224,8 +224,6 @@ function CreateUser() {
                     }
                 });
 
-            console.log('Full response:', response);
-
             if (response.status === 400) {
                 Warning(response.response.data.message || 'An error occurred!');
                 return;
