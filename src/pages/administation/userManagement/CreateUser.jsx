@@ -164,7 +164,7 @@ function CreateUser() {
 
     const getUserData = useCallback(async () => {
         if (!viewItem?.id && !editItem?.id) {
-            Warning('ID is required');
+            Warning('Unexpected error occurred');
             return;
         }
 

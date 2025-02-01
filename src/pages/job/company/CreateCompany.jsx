@@ -88,7 +88,6 @@ function CreateCompany() {
                 }
             )
             .test("aspectRatio", "Image must have a 1:1 ratio", async (value) => {
-                // Validate aspect ratio for file inputs
                 if (value instanceof File) {
                     return new Promise((resolve) => {
                         const reader = new FileReader();
@@ -104,7 +103,7 @@ function CreateCompany() {
                         reader.readAsDataURL(value);
                     });
                 }
-                return true; // Skip aspect ratio check for string inputs
+                return true; 
             }),
 
     });
@@ -142,7 +141,7 @@ function CreateCompany() {
 
     const getCompanyData = useCallback(async () => {
         if (!viewItem?.id && !editItem?.id) {
-            Warning('ID is required');
+            Warning('Unexpected error occurred');
             return;
         }
 
@@ -185,14 +184,6 @@ function CreateCompany() {
 
     const fetchDropdownData = async () => {
         try {
-            // const [roleRes, countryRes] = await Promise.all([getRoles(), getCountry()]);
-
-            // if (roleRes.status === 200) {
-            //     setRoleData(roleRes.data);
-            // } else {
-            //     console.warn('Failed to fetch roles:', roleRes.status);
-            // }
-
             const countryRes = await getCountry()
 
             if (countryRes.status === 200) {
@@ -304,7 +295,6 @@ function CreateCompany() {
             console.log(error);
         }
     }
-
 
     useEffect(() => {
         if (form.values.country) {

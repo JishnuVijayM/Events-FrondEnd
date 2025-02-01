@@ -192,6 +192,16 @@ export const editCompany = async (id, data) => {
     }
 };
 
+export const getCompanyList = async () => {
+    try {
+        const res = await axiosInstance.get(`/company/getCompanyList`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+
 //job
 export const createJob = async (data) => {
     try {
@@ -210,3 +220,22 @@ export const getAllJobs = async () => {
         return error
     }
 }
+
+export const viewJob = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/job/viewJob/${id}`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const editJob = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/job/updateJob/${id}`,data);
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

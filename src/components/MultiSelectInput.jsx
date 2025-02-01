@@ -22,11 +22,12 @@ function MultiSelectInput({
     const selectedOptions = value.map(val => {
         const option = data.find(item => item.value === val);
         return option ? { value: option.value, label: option.label } : null;
-    }).filter(option => option !== null); 
+    }).filter(option => option !== null);
 
     return (
-        <div className={`flex flex-col ${width} ${className}`}>
-            <label className="text-white mb-1">
+        <div className={`flex flex-col ${width} ${className} ${disabled ? 'opacity-70 cursor-not-allowed' : ''}`}>
+        <label className={`text-white mb-1`}>
+    
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
             <MultiSelect
@@ -34,10 +35,10 @@ function MultiSelectInput({
                 className='multiselect'
                 name={name}
                 options={data}
-                value={selectedOptions} 
-                onChange={handleOnChange} 
+                value={selectedOptions}
+                onChange={handleOnChange}
                 labelledBy={label}
-                disable={disabled}
+                disabled={disabled}
             />
             {error && <p className="p-0 m-0 text-red-600 font-normal text-end">{error}</p>}
         </div>
