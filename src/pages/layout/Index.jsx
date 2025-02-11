@@ -13,6 +13,7 @@ import { handleAddPermissions } from '../../redux/rolePrevilages/permissionsSlic
 import { setActiveTab } from '../../redux/tabContents/tabSlice';
 import CompanyManagement from '../job/company/CompanyManagement';
 import JobOpenings from '../job/jobOpenings/JobOpenings';
+import CandidateManagement from '../job/candidate/CandidateManagement';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -151,7 +152,7 @@ const Index = () => {
                 {
                     id: 'candidate-list',
                     name: 'Candidate List',
-                    href: '/home/candidates',
+                    href: '/admin/candidate-management',
                     permissionModule: 'candidateManagement'
                 }
             ]
@@ -394,6 +395,7 @@ const Index = () => {
                     <Route path="authentication" element={<Authentication />} />
                     <Route path="company-management" element={<CompanyManagement />} />
                     <Route path="job-management" element={<JobOpenings />} />
+                    <Route path="candidate-management" element={<CandidateManagement />} />
                 </Routes>
             </main>
         </>

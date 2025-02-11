@@ -19,7 +19,7 @@ const initialPermissions = {
     jobManagement: [
         { module: 'companyManagement', read: false, add: false, edit: false, delete: false },
         { module: 'jobManagement', read: false, add: false, edit: false, delete: false },
-        { module: 'candidateManagement', read: false, edit: false },
+        { module: 'candidateManagement', read: false, viewAll:false },
     ],
     eventManagement: [
         { module: 'eventManagement', read: false, add: false, edit: false, delete: false },
@@ -44,6 +44,7 @@ function CreateRole() {
         description: "",
         permissions: ""
     });
+    
 
     const validateInputs = () => {
         let isValid = true;
@@ -123,7 +124,7 @@ function CreateRole() {
                 !updatedPermissions[category][moduleIndex][permission];
 
             if (permission === 'read' && !updatedPermissions[category][moduleIndex][permission]) {
-                ['add', 'edit', 'delete'].forEach(perm => {
+                ['add', 'edit', 'delete','viewAll'].forEach(perm => {
                     if (updatedPermissions[category][moduleIndex][perm] !== undefined) {
                         updatedPermissions[category][moduleIndex][perm] = false;
                     }
@@ -176,7 +177,7 @@ function CreateRole() {
                 {module.module.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim()}
             </p>
             <div className="flex flex-col gap-3">
-                {['read', 'add', 'edit', 'delete'].map((permission) => (
+                {['read', 'add', 'edit', 'delete','viewAll'].map((permission) => (
                     module[permission] !== undefined && (
                         <label key={permission} className="flex items-center cursor-pointer text-white">
                             <input

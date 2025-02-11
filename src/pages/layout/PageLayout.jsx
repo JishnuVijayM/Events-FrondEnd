@@ -10,40 +10,30 @@ const PageLayout = ({
     fetchData,
     columnHeaders,
     addComponent,
-    pathIdentifier
+    pathIdentifier,
+    firstTabName,
+    secondTabName,
+    thirdTabName,
+    otherComponent
 }) => {
     const { pathname } = useLocation();
     const [tableData, setTableData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
     const { activeTab } = useSelector((state) => state.tabContent);
 
     useEffect(() => {
         const fetchPageData = async () => {
-            // Remove the pathname check or make it less strict if needed
-            if (!pathname.includes(pathIdentifier)) {
-                alert('w')
-                return;
-            }
+            if (!pathname.includes(pathIdentifier)) return;
 
             setIsLoading(true);
             try {
                 const response = await fetchData();
-
                 const responseData = response.data || response;
 
-                if (Array.isArray(responseData)) {
-                    setTableData(responseData);
-                } else {
-                    console.error('Response data is not an array:', responseData);
-                    setTableData([]);
-                }
+                setTableData(Array.isArray(responseData) ? responseData : []);
             } catch (error) {
-                console.error(`Error fetching ${pageType}s:`, error);
-                console.error('Error details:', {
-                    message: error.message,
-                    response: error.response,
-                    stack: error.stack
-                });
+                console.error(`Error fetching ${pageType}s:`, error.message);
                 setTableData([]);
             } finally {
                 setIsLoading(false);
@@ -51,12 +41,23 @@ const PageLayout = ({
         };
 
         fetchPageData();
-    }, [pathname, activeTab, fetchData, pageType]);
+    }, [pathname, fetchData, pageType]);
 
-    const tabs = useMemo(() => [
-        { id: "list", label: `${pageType.charAt(0).toUpperCase() + pageType.slice(1)} List` },
-        { id: "add", label: `New ${pageType.charAt(0).toUpperCase() + pageType.slice(1)}` },
-    ], [pageType]);
+    const tabs = useMemo(() => {
+        const capitalizePageType = pageType.charAt(0).toUpperCase() + pageType.slice(1);
+
+        return [
+            {
+                id: 'list',
+                label: firstTabName?.trim() || `${capitalizePageType} List`
+            },
+            {
+                id: 'add',
+                label: secondTabName?.trim() || `New ${capitalizePageType}`
+            },
+            ...(thirdTabName?.trim() ? [{ id: 'other', label: thirdTabName }] : [])
+        ];
+    }, [pageType, firstTabName, secondTabName, thirdTabName]);
 
     const tabContent = useMemo(() => ({
         list: (
@@ -73,7 +74,8 @@ const PageLayout = ({
             </Loader>
         ),
         add: addComponent,
-    }), [isLoading, tableData, columnHeaders, addComponent, pageType]);
+        other: otherComponent,
+    }), [isLoading, tableData, columnHeaders, addComponent, otherComponent, pageType]);
 
     return (
         <div>
