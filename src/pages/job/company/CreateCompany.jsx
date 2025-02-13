@@ -40,7 +40,6 @@ function CreateCompany() {
         { label: "E-commerce", value: "e_commerce" },
     ])
 
-
     const validationSchema = Yup.object({
         companyName: Yup.string()
             .required("Company name is required")
@@ -227,8 +226,6 @@ function CreateCompany() {
                         'Content-Type': 'multipart/form-data',
                     }
                 });
-
-            console.log('Full response:', response);
 
             if (response.status === 400) {
                 Warning(response.response.data.message || 'An error occurred!');

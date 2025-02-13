@@ -14,6 +14,7 @@ import { setActiveTab } from '../../redux/tabContents/tabSlice';
 import CompanyManagement from '../job/company/CompanyManagement';
 import JobOpenings from '../job/jobOpenings/JobOpenings';
 import CandidateManagement from '../job/candidate/CandidateManagement';
+import EventManagement from '../event/event/EventManagement';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -166,7 +167,7 @@ const Index = () => {
                 {
                     id: 'event',
                     name: 'Event',
-                    href: '/home/event',
+                    href: '/admin/event-management',
                     permissionModule: 'eventManagement'
                 },
                 {
@@ -396,6 +397,7 @@ const Index = () => {
                     <Route path="company-management" element={<CompanyManagement />} />
                     <Route path="job-management" element={<JobOpenings />} />
                     <Route path="candidate-management" element={<CandidateManagement />} />
+                    <Route path="event-management" element={<EventManagement />} />
                 </Routes>
             </main>
         </>

@@ -239,3 +239,30 @@ export const editJob = async (id, data) => {
         return error;
     }
 };
+
+//event
+export const createEvent = async (data) => {
+    try {
+        const res = await axiosInstance.post(
+            `/event/createEvent`,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        return error;
+    }
+};
+
+export const getAllEvents = async () => {
+    try {
+        const res = await axiosInstance.get(`/event/getEvents`)
+        return res.data
+    } catch (error) {
+        return error
+    }
+}

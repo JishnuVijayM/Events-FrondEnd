@@ -44,7 +44,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             'user-management': `/user/deleteUser/${id}`,
             'company-management': `/company/deleteCompany/${id}`,
             'job-management': `/job/deleteJob/${id}`,
-
+            'event-management': `/event/deleteEvent/${id}`,
         };
 
         const endpoint = endpoints[currentPage];

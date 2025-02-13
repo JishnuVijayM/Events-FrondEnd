@@ -90,8 +90,6 @@ function CreateJob() {
                     response = await createJob(values);
                 }
 
-                console.log('Full response:', response);
-
                 if (response.status === 400) {
                     Warning(response.response?.data?.message || 'An error occurred!');
                     return;
@@ -109,8 +107,6 @@ function CreateJob() {
                 }
 
             } catch (error) {
-                console.log('job e', error);
-
                 Error(`Failed to ${editItem.isEdit ? 'update' : 'create'} job`);
             } finally {
                 setIsSubmitting(false)

@@ -13,7 +13,6 @@ import { Error, Success, Warning } from '../../../components/Notification';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 
 
-
 function CreateUser() {
     const [imageFile, setImageFile] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -205,7 +204,6 @@ function CreateUser() {
             getUserData();
         }
     }, [viewItem, editItem]);
-
 
     const handleSubmit = async (event, formData) => {
         event.preventDefault();
