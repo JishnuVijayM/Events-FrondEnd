@@ -42,7 +42,6 @@ function CreateEvent() {
     const [company, setCompany] = useState([])
     const [location, setLocation] = useState([])
 
-
     const validationSchema = Yup.object({
         name: Yup.string()
             .required("Event name is required")
@@ -126,15 +125,13 @@ function CreateEvent() {
                     response = await createEvent(formData);
                 }
 
-                console.log('Full response event:', response);
-
                 if (response.status === 400) {
                     Warning(response.response?.data?.message || 'An error occurred!');
                     return;
                 }
 
                 if (response.status === 404) {
-                    Warning('An error occurred!');
+                    Warning(response.response?.data?.message || 'An error occurred!');
                     return;
                 }
 
@@ -338,7 +335,7 @@ function CreateEvent() {
                             error={form.touched.companies && form.errors.companies}
                         />
 
-                        <TextInput
+                        <TextArea
                             disabled={viewItem.isView}
                             required
                             label="Contact Info"
@@ -369,7 +366,7 @@ function CreateEvent() {
                             className="mr-1"
                         />
 
-                        <TextInput
+                        <TextArea
                             disabled={viewItem.isView}
                             required
                             label="Event Agenda"

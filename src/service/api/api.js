@@ -292,3 +292,39 @@ export const editEvent = async (id, data) => {
         return error;
     }
 };
+
+export const getEventList = async () => {
+    try {
+        const res = await axiosInstance.get(`/event/getEventList`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+//event user
+export const createEventUser = async (data) => {
+    try {
+        const res = await axiosInstance.post(
+            `/event/createEventUser`,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        return error;
+    }
+};
+
+export const getAllEventUsers = async () => {
+    try {
+        const res = await axiosInstance.get(`/event/getEventUsers`)
+        return res.data
+    } catch (error) {
+        return error
+    }
+}
