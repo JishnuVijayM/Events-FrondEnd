@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Loader from '../../../components/Loader';
 import TextInput from '../../../components/TextInput';
 import SelectInput from '../../../components/SelectInput';
@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import DateInput from '../../../components/DateInput';
 import MultiSelectInput from '../../../components/MultiSelectInput';
-import { createEvent } from '../../../service/api/api';
+import { createEvent, editEvent, getCity, getCompanyList, viewEvent } from '../../../service/api/api';
 import { Error, Success, Warning } from '../../../components/Notification';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 
@@ -20,45 +20,65 @@ function CreateEvent() {
     const { viewItem, editItem } = useSelector((state) => state.tabContent);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const dispatch = useDispatch();
+    const [eventList, setEventList] = useState([
+        { value: "Onsite", label: "Onsite" },
+        { value: "Virtual", label: "Virtual" },
+        { value: "Hybrid", label: "Hybrid" },
+        { value: "Seminar", label: "Seminar" },
+        { value: "Workshop", label: "Workshop" },
+        { value: "Webinar", label: "Webinar" },
+        { value: "Tech Expo", label: "Tech Expo" },
+        { value: "Bootcamp", label: "Bootcamp" },
+        { value: "Meetup", label: "Meetup" },
+        { value: "Training Session", label: "Training Session" },
+    ])
+    const [eventStatus, setEventStatus] = useState([
+        { value: "Upcoming", label: "Upcoming" },
+        { value: "Ongoing", label: "Ongoing" },
+        { value: "Completed", label: "Completed" },
+        { value: "Cancelled", label: "Cancelled" },
+        { value: "Postponed", label: "Postponed" }
+    ])
+    const [company, setCompany] = useState([])
+    const [location, setLocation] = useState([])
 
 
     const validationSchema = Yup.object({
-        // name: Yup.string()
-        //     .required("Event name is required")
-        //     .min(2, "Must be at least 2 characters"),
-        // type: Yup.string().required("Please select an event type"),
-        // location: Yup.string().required("Please select a location"),
-        // startDate: Yup.date()
-        //     .required("Start date is required")
-        //     .max(Yup.ref("endDate"), "Start date must be before end date"),
-        // endDate: Yup.date()
-        //     .required("End date is required")
-        //     .min(Yup.ref("startDate"), "End date must be after start date"),
-        // description: Yup.string()
-        //     .required("Event description is required")
-        //     .min(6, "Event description must be at least 6 characters"),
+        name: Yup.string()
+            .required("Event name is required")
+            .min(2, "Must be at least 2 characters"),
+        type: Yup.string().required("Please select an event type"),
+        location: Yup.string().required("Please select a location"),
+        startDate: Yup.date()
+            .required("Start date is required")
+            .max(Yup.ref("endDate"), "Start date must be before end date"),
+        endDate: Yup.date()
+            .required("End date is required")
+            .min(Yup.ref("startDate"), "End date must be after start date"),
+        description: Yup.string()
+            .required("Event description is required")
+            .min(6, "Event description must be at least 6 characters"),
         companies: Yup.array().min(1, 'At least one company is required').required('Company is required'),
-
-        // info: Yup.string().required('Contact info is required'),
-        // coordinator: Yup.string().required("Event coordinator is required"),
-        // agenda: Yup.string().required("Event agenda is required"),
-        // participatingNo: Yup.number()
-        //     .required("Number of participants is required")
-        //     .min(1, "Number of participants must be at least 1"),
-        // vacancy: Yup.number()
-        //     .required("Vacancy is required")
-        //     .min(1, "Vacancy must be at least 1"),
-        // status: Yup.string().required("Please select event status"),
-        // eventBanner: Yup.mixed()
-        //     .required("Event Banner is required")
-        //     .test(
-        //         "fileType",
-        //         "Only image files (JPEG/PNG) are allowed and should be less than 5MB",
-        //         (value) => {
-        //             if (typeof value === "string") return true;
-        //             return value && ["image/jpeg", "image/png"].includes(value.type) && value.size <= 5 * 1024 * 1024;
-        //         }
-        //     ),
+        info: Yup.string().required('Contact info is required'),
+        coordinator: Yup.string().required("Event coordinator is required"),
+        agenda: Yup.string().required("Event agenda is required"),
+        participatingNo: Yup.number()
+            .required("Number of participants is required")
+            .min(1, "Number of participants must be at least 1"),
+        vacancy: Yup.number()
+            .required("Vacancy is required")
+            .min(1, "Vacancy must be at least 1"),
+        status: Yup.string().required("Please select event status"),
+        eventBanner: Yup.mixed()
+            .required("Event Banner is required")
+            .test(
+                "fileType",
+                "Only image files (JPEG/PNG) are allowed and should be less than 5MB",
+                (value) => {
+                    if (typeof value === "string") return true;
+                    return value && ["image/jpeg", "image/png"].includes(value.type) && value.size <= 5 * 1024 * 1024;
+                }
+            ),
     });
 
     const form = useFormik({
@@ -66,8 +86,8 @@ function CreateEvent() {
             name: '',
             type: '',
             location: '',
-            startDate: '',
-            endDate: '',
+            startDate: null,
+            endDate: null,
             description: '',
             companies: [],
             info: '',
@@ -89,7 +109,7 @@ function CreateEvent() {
             Object.keys(values).forEach(key => {
                 if (Array.isArray(values[key])) {
                     values[key].forEach(item => {
-                        formData.append(`${key}[]`, item); 
+                        formData.append(`${key}[]`, item);
                     });
                 } else {
                     formData.append(key, values[key]);
@@ -101,8 +121,7 @@ function CreateEvent() {
                 let response
 
                 if (editItem.isEdit) {
-                    // response = await editJob(editItem.id, formData);
-                    response = null
+                    response = await editEvent(editItem.id, formData);
                 } else {
                     response = await createEvent(formData);
                 }
@@ -141,6 +160,79 @@ function CreateEvent() {
         form.setFieldValue('eventBanner', file)
     };
 
+    const getEventData = useCallback(async () => {
+        if (!viewItem?.id && !editItem?.id) {
+            Warning('Unexpected error occurred');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await viewEvent(viewItem.id || editItem?.id);
+
+            if (response.status === 200) {
+                const data = response.data;
+                form.setValues({
+                    name: data.name || '',
+                    type: data.type || '',
+                    location: data.location || '',
+                    startDate: data.startDate || '',
+                    endDate: data.endDate || '',
+                    description: data.description || '',
+                    companies: data.companies || [],
+                    info: data.info || '',
+                    coordinator: data.coordinator || '',
+                    agenda: data.agenda || '',
+                    participatingNo: data.participatingNo || '',
+                    vacancy: data.vacancy || '',
+                    status: data.status || '',
+                    eventBanner: data.eventBanner || null,
+                });
+
+            } else {
+                dispatch(setActiveTab("list"));
+                Error(response.data?.message || 'Unexpected error occurred');
+                console.error('Error fetching event:');
+            }
+        } catch (error) {
+            dispatch(setActiveTab("list"));
+            Error(error.message || 'Failed to fetch event details');
+            console.error('Error fetching event:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [viewItem?.id, editItem?.id]);
+
+    const fetchData = async () => {
+        try {
+            const [companyRes, cityRes] = await Promise.all([getCompanyList(), getCity("IN", "KL")]);
+
+            if (companyRes?.status === 200) {
+                setCompany(companyRes.data.data);
+            }
+
+            if (cityRes?.status === 200) {
+                const updatedData = cityRes?.data?.map(item => ({
+                    value: item.name,
+                    label: item.name
+                }));
+                setLocation(updatedData);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        if ((viewItem?.id && (viewItem.isView || viewItem.isEdit)) || (editItem?.id && (editItem.isView || editItem.isEdit))) {
+            getEventData();
+        }
+    }, [viewItem, editItem]);
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     return (
         <Loader isLoading={isLoading}>
             <form onSubmit={form.handleSubmit} className="w-full rounded-md bg-gray p-5 flex">
@@ -172,7 +264,7 @@ function CreateEvent() {
                             onChange={form.handleChange}
                             onBlur={form.handleBlur}
                             error={form.touched.type && form.errors.type}
-                            data={[{ label: 'demo', value: 'demo' }]}
+                            data={eventList}
                         />
 
                         <SelectInput
@@ -186,7 +278,7 @@ function CreateEvent() {
                             onChange={form.handleChange}
                             onBlur={form.handleBlur}
                             error={form.touched.location && form.errors.location}
-                            data={[{ label: 'demo', value: 'demo' }]}
+                            data={location}
                         />
                     </div>
 
@@ -196,7 +288,7 @@ function CreateEvent() {
                             disabled={viewItem.isView}
                             onChange={(e) => form.setFieldValue('startDate', e.target.value)}
                             width="w-1/3"
-                            value={form.values.startDate}
+                            value={form.values.startDate ? form.values.startDate.split('T')[0] : ''}
                             required
                             label="Start Date"
                             name="startDate"
@@ -209,7 +301,7 @@ function CreateEvent() {
                             className="mx-1"
                             onChange={(e) => form.setFieldValue('endDate', e.target.value)}
                             width="w-1/3"
-                            value={form.values.endDate}
+                            value={form.values.endDate ? form.values.endDate.split('T')[0] : ''}
                             required
                             label="End Date"
                             name="endDate"
@@ -240,9 +332,7 @@ function CreateEvent() {
                             placeholder="Select companies"
                             width="w-2/3"
                             name="companies"
-                            data={[{ label: 'demo', value: 'demo' },
-                            { label: 'demo1', value: 'demo1' }
-                            ]}
+                            data={company}
                             value={form.values.companies}
                             onChange={(selected) => form.setFieldValue('companies', selected)}
                             error={form.touched.companies && form.errors.companies}
@@ -337,7 +427,7 @@ function CreateEvent() {
                             onChange={form.handleChange}
                             onBlur={form.handleBlur}
                             error={form.touched.status && form.errors.status}
-                            data={[{ label: 'demo', value: 'demo' }]}
+                            data={eventStatus}
                             className="ml-1"
                         />
                     </div>
@@ -357,6 +447,7 @@ function CreateEvent() {
                 {/* Image Upload */}
                 <div className="w-1/6 ms-2">
                     <ImageUpload
+                        initialImage={form.values.eventBanner}
                         required
                         disabled={viewItem.isView}
                         label="Event Banner"

@@ -41,7 +41,7 @@ const PageLayout = ({
         };
 
         fetchPageData();
-    }, [pathname, fetchData, pageType]);
+    }, [pathname, fetchData, pageType, activeTab]);
 
     const tabs = useMemo(() => {
         const capitalizePageType = pageType.charAt(0).toUpperCase() + pageType.slice(1);

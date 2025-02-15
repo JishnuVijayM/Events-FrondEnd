@@ -151,7 +151,7 @@ function CreateJob() {
             const response = await viewJob(viewItem.id || editItem?.id);
 
             if (response.status === 200) {
-                const data = response.data;
+                const data = response.data;                
                 form.setValues({
                     jobTitle: data.jobTitle || '',
                     company: data.company || '',

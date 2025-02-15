@@ -266,3 +266,29 @@ export const getAllEvents = async () => {
         return error
     }
 }
+
+export const viewEvent = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/event/viewEvent/${id}`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const editEvent = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/event/updateEvent/${id}`,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

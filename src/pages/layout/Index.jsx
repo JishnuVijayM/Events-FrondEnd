@@ -15,6 +15,7 @@ import CompanyManagement from '../job/company/CompanyManagement';
 import JobOpenings from '../job/jobOpenings/JobOpenings';
 import CandidateManagement from '../job/candidate/CandidateManagement';
 import EventManagement from '../event/event/EventManagement';
+import UserRegistation from '../event/userRegistation/UserRegistation';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -33,9 +34,8 @@ const Index = () => {
     const { pathname } = useLocation();
 
     const handleFetchPermission = async () => {
-
         const roleId = localStorage.getItem('id')
-
+        
         if (!roleId) {
             alert('session expired, login again')
             navigate('/')
@@ -165,15 +165,15 @@ const Index = () => {
             href: '#',
             subMenu: [
                 {
-                    id: 'event',
+                    id: 'event-management',
                     name: 'Event',
                     href: '/admin/event-management',
                     permissionModule: 'eventManagement'
                 },
                 {
-                    id: 'user-registration',
+                    id: 'event-user-management',
                     name: 'User Registration',
-                    href: '/home/registration',
+                    href: '/admin/event-user-management',
                     permissionModule: 'eventUserManagement'
                 }
             ]
@@ -398,6 +398,7 @@ const Index = () => {
                     <Route path="job-management" element={<JobOpenings />} />
                     <Route path="candidate-management" element={<CandidateManagement />} />
                     <Route path="event-management" element={<EventManagement />} />
+                    <Route path="event-user-management" element={<UserRegistation />} />
                 </Routes>
             </main>
         </>
