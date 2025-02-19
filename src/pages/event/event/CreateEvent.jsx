@@ -160,6 +160,7 @@ function CreateEvent() {
     const getEventData = useCallback(async () => {
         if (!viewItem?.id && !editItem?.id) {
             Warning('Unexpected error occurred');
+            dispatch(setActiveTab("list"));
             return;
         }
 
@@ -185,7 +186,6 @@ function CreateEvent() {
                     status: data.status || '',
                     eventBanner: data.eventBanner || null,
                 });
-
             } else {
                 dispatch(setActiveTab("list"));
                 Error(response.data?.message || 'Unexpected error occurred');
