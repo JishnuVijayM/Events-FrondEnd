@@ -46,15 +46,20 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             'job-management': `/job/deleteJob/${id}`,
             'event-management': `/event/deleteEvent/${id}`,
             'event-user-management': `/event/deleteEventUser/${id}`,
+            'static-pages': `/page/deletePage/${id}`,
         };
 
         const endpoint = endpoints[currentPage];
 
         try {
             const response = await deleteApi(endpoint);
+
+            console.log(response);
+            
+            
             if (response.status === 200) {
                 setTableData((prevData) => prevData.filter((item) => item.id !== id));
-                Success('Item successfully deleted');
+                Success( response.data.message ||'Item successfully deleted');
             }
         } catch (error) {
             console.error('Delete operation failed:', error);
@@ -105,7 +110,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
     // Create action column definition
     const actionColumn = {
         id: 'actions',
-        header: 'Actions',
+        header: 'ACTIONS',
         size: 100,
         Cell: ({ row }) => (
             <>

@@ -16,6 +16,7 @@ import JobOpenings from '../job/jobOpenings/JobOpenings';
 import CandidateManagement from '../job/candidate/CandidateManagement';
 import EventManagement from '../event/event/EventManagement';
 import UserRegistation from '../event/userRegistation/UserRegistation';
+import StaticPages from '../settings/staticPages/StaticPages';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -211,7 +212,7 @@ const Index = () => {
                 {
                     id: 'static-pages',
                     name: 'Static Pages',
-                    href: '/home/static-pages',
+                    href: '/admin/static-pages',
                     permissionModule: 'staticPages'
                 },
                 {
@@ -399,6 +400,7 @@ const Index = () => {
                     <Route path="candidate-management" element={<CandidateManagement />} />
                     <Route path="event-management" element={<EventManagement />} />
                     <Route path="event-user-management" element={<UserRegistation />} />
+                    <Route path="static-pages" element={<StaticPages />} />
                 </Routes>
             </main>
         </>

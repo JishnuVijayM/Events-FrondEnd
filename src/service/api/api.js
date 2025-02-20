@@ -354,3 +354,41 @@ export const editEventUser = async (id, data) => {
         return error;
     }
 };
+
+//static pages
+export const createPage = async (data) => {
+    try {
+        const res = await axiosInstance.post(`/page/createPage`, data)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const getAllPages = async () => {
+    try {
+        const res = await axiosInstance.get(`/page/getPages`)
+        return res.data
+    } catch (error) {
+        return error
+    }
+}
+
+export const viewPage = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/page/viewPage/${id}`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const editPage = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/page/updatePage/${id}`,data);
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

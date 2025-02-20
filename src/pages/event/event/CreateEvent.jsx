@@ -429,7 +429,6 @@ function CreateEvent() {
                         />
                     </div>
 
-                    {/* Submit Button */}
                     <div className="flex w-full mt-4 justify-center">
                         <Reset onClick={form.handleReset} className="me-1" disabled={viewItem.isView || isSubmitting} />
                         <Save
