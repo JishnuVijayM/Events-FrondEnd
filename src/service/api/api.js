@@ -392,3 +392,41 @@ export const editPage = async (id, data) => {
         return error;
     }
 };
+
+//faq
+export const createFaq = async (data) => {
+    try {
+        const res = await axiosInstance.post(`/faq/createFaq`, data)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const getAllFaq = async () => {
+    try {
+        const res = await axiosInstance.get(`/faq/getAllFaq`)
+        return res.data
+    } catch (error) {
+        return error
+    }
+}
+
+export const viewFaq = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/faq/viewFaq/${id}`)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const editFaq = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/faq/updateFaq/${id}`,data);
+        return res;
+    } catch (error) {
+        return error;
+    }
+};

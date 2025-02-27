@@ -67,7 +67,7 @@ const CreateStaticPage = () => {
                 }
 
             } catch (error) {
-                console.log('event', error);
+                console.log('static', error);
 
                 Error(`Failed to ${editItem.isEdit ? 'update' : 'create'} statuc page`);
             } finally {
@@ -113,7 +113,6 @@ const CreateStaticPage = () => {
             setIsLoading(false);
         }
     }, [viewItem?.id, editItem?.id]);
-
 
     useEffect(() => {
         if ((viewItem?.id && (viewItem.isView || viewItem.isEdit)) || (editItem?.id && (editItem.isView || editItem.isEdit))) {

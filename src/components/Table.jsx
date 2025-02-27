@@ -47,6 +47,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             'event-management': `/event/deleteEvent/${id}`,
             'event-user-management': `/event/deleteEventUser/${id}`,
             'static-pages': `/page/deletePage/${id}`,
+            'faq': `/faq/deleteFaq/${id}`,
         };
 
         const endpoint = endpoints[currentPage];
@@ -55,11 +56,11 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             const response = await deleteApi(endpoint);
 
             console.log(response);
-            
-            
+
+
             if (response.status === 200) {
                 setTableData((prevData) => prevData.filter((item) => item.id !== id));
-                Success( response.data.message ||'Item successfully deleted');
+                Success(response.data.message || 'Item successfully deleted');
             }
         } catch (error) {
             console.error('Delete operation failed:', error);
@@ -158,7 +159,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         useKeysAsHeaders: true,
         filename: exportFileName,
     });
-    
+
     const handleExportRows = (rows) => {
         const rowData = rows.map((row) => {
             const { id, ...rest } = row.original; // Exclude 'id' field
@@ -167,13 +168,13 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
         const csv = generateCsv(csvConfig)(rowData);
         download(csvConfig)(csv);
     };
-    
+
     const handleExportData = () => {
         const dataWithoutId = tableData.map(({ id, ...rest }) => rest); // Exclude 'id' field
         const csv = generateCsv(csvConfig)(dataWithoutId);
         download(csvConfig)(csv);
     };
-    
+
 
     return (
         <>

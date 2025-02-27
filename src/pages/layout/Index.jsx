@@ -17,6 +17,7 @@ import CandidateManagement from '../job/candidate/CandidateManagement';
 import EventManagement from '../event/event/EventManagement';
 import UserRegistation from '../event/userRegistation/UserRegistation';
 import StaticPages from '../settings/staticPages/StaticPages';
+import Faq from '../settings/faq/Faq';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -36,7 +37,7 @@ const Index = () => {
 
     const handleFetchPermission = async () => {
         const roleId = localStorage.getItem('id')
-        
+
         if (!roleId) {
             alert('session expired, login again')
             navigate('/')
@@ -206,7 +207,7 @@ const Index = () => {
                 {
                     id: 'faq',
                     name: 'FAQ',
-                    href: '/home/faq',
+                    href: '/admin/faq',
                     permissionModule: 'faq'
                 },
                 {
@@ -401,6 +402,8 @@ const Index = () => {
                     <Route path="event-management" element={<EventManagement />} />
                     <Route path="event-user-management" element={<UserRegistation />} />
                     <Route path="static-pages" element={<StaticPages />} />
+                    <Route path="faq" element={<Faq />} />
+
                 </Routes>
             </main>
         </>
