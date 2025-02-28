@@ -18,6 +18,7 @@ import EventManagement from '../event/event/EventManagement';
 import UserRegistation from '../event/userRegistation/UserRegistation';
 import StaticPages from '../settings/staticPages/StaticPages';
 import Faq from '../settings/faq/Faq';
+import Notification from '../settings/notification/Notification';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -219,7 +220,7 @@ const Index = () => {
                 {
                     id: 'notification',
                     name: 'Notification',
-                    href: '/home/notification',
+                    href: '/admin/notification',
                     permissionModule: 'notification'
                 },
                 {
@@ -403,6 +404,7 @@ const Index = () => {
                     <Route path="event-user-management" element={<UserRegistation />} />
                     <Route path="static-pages" element={<StaticPages />} />
                     <Route path="faq" element={<Faq />} />
+                    <Route path="notification" element={<Notification />} />
 
                 </Routes>
             </main>
