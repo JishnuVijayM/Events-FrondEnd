@@ -10,7 +10,7 @@ import TextInput from '../../../components/TextInput';
 import SelectInput from '../../../components/SelectInput';
 import DateTimePicker from '../../../components/DateTimePicker';
 import DateInput from '../../../components/DateInput';
-import { createNotify, getEventList, viewNotify } from '../../../service/api/api';
+import { createNotify, editNotify, getEventList, viewNotify } from '../../../service/api/api';
 import { Success, Warning } from '../../../components/Notification';
 import { setActiveTab } from '../../../redux/tabContents/tabSlice';
 
@@ -62,7 +62,7 @@ function CreateNotification() {
                 let response
 
                 if (editItem.isEdit) {
-                    // response = await editFaq(editItem.id, values);
+                    response = await editNotify(editItem.id, values);
                 } else {
                     response = await createNotify(values);
                 }

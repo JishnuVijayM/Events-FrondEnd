@@ -458,3 +458,13 @@ export const viewNotify = async (id) => {
         return error
     }
 }
+
+export const editNotify = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(
+            `/notify/updateNotify/${id}`,data);
+        return res;
+    } catch (error) {
+        return error;
+    }
+};
