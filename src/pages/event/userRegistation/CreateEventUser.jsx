@@ -3,7 +3,6 @@ import Save from '../../../components/Save'
 import Reset from '../../../components/Reset'
 import TextInput from '../../../components/TextInput'
 import SelectInput from '../../../components/SelectInput'
-import TextArea from '../../../components/TextArea'
 import Loader from '../../../components/Loader'
 import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup';
@@ -12,7 +11,6 @@ import DateInput from '../../../components/DateInput'
 import { createEventUser, editEventUser, getCity, getEventList, getRoles, viewEventUser } from '../../../service/api/api'
 import { Success, Warning } from '../../../components/Notification'
 import { setActiveTab } from '../../../redux/tabContents/tabSlice'
-import FileInput from '../../../components/FileInput'
 
 
 function CreateEventUser() {

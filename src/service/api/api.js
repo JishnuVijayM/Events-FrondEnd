@@ -430,3 +430,31 @@ export const editFaq = async (id, data) => {
         return error;
     }
 };
+
+//Notification
+export const createNotify = async (data) => {
+    try {
+        const res = await axiosInstance.post(`/notify/createNotify`, data)
+        return res
+    } catch (error) {
+        return error
+    }
+}
+
+export const getAllNotify = async () => {
+    try {
+        const res = await axiosInstance.get(`/notify/getAllNotify`)
+        return res.data
+    } catch (error) {
+        return error
+    }
+}
+
+export const viewNotify = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/notify/viewNotify/${id}`)
+        return res
+    } catch (error) {
+        return error
+    }
+}

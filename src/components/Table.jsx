@@ -48,6 +48,7 @@ const Table = ({ data, columnHeaders, exportFileName = 'table_data' }) => {
             'event-user-management': `/event/deleteEventUser/${id}`,
             'static-pages': `/page/deletePage/${id}`,
             'faq': `/faq/deleteFaq/${id}`,
+            'notification': `/notify/deleteNotify/${id}`,
         };
 
         const endpoint = endpoints[currentPage];
