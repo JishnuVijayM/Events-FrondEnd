@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
-const DateTimePicker = ({ onChange, className, name, label = "Select Date & Time", required = false, error, disabled, width = 'w-1/3' }) => {
-    const [selectedDate, setSelectedDate] = useState(null);
+const DateTimePicker = ({ value, onChange, className, name, label = "Select Date & Time", required = false, error, disabled, width = 'w-1/3' }) => {
+    // Convert incoming ISO string to Date object
+    const [selectedDate, setSelectedDate] = useState(value ? parseISO(value) : null);
+
+    useEffect(() => {
+        if (value) {
+            setSelectedDate(parseISO(value)); // Ensure proper date format
+        }
+    }, [value]);
 
     const handleChange = (date) => {
         setSelectedDate(date);
-        onChange && onChange(date);
+        onChange && onChange(date ? date.toISOString() : ""); // Convert back to ISO format on change
     };
 
     return (
