@@ -38,8 +38,9 @@ const Index = () => {
 
     const handleFetchPermission = async () => {
         const roleId = localStorage.getItem('id')
+        const token = localStorage.getItem('token')
 
-        if (!roleId) {
+        if (!roleId || !token) {
             alert('session expired, login again')
             navigate('/')
             return

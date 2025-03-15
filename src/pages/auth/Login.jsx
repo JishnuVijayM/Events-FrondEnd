@@ -38,27 +38,16 @@ function Login() {
             const response = await login(values);
 
             if (response?.status === 200) {
-                const { role, token } = response.data;
-
+                const { role, id, token } = response.data;
+                
                 if (role && token) {
                     localStorage.setItem('token', token);
-                    localStorage.setItem('id', role);
-                    dispatch(setRoleId(role));
+                    localStorage.setItem('id', id);
+                    dispatch(setRoleId(id));
 
-                    // Fetch permissions
-                    const permissionResponse = await viewRole(role);
-
-                    console.log('permissionResponse', permissionResponse);
-
-
-                    if (permissionResponse?.status === 200) {
-                        dispatch(handleAddPermissions(permissionResponse.data.permissions));
-                        Success('Login successful!');
-                        navigate('/admin');
-
-                    } else {
-                        handleFetchError(permissionResponse);
-                    }
+                    dispatch(handleAddPermissions(role));
+                    Success('Login successful!');
+                    navigate('/admin');
                 } else {
                     handleError(400, setErrors);
                 }
@@ -78,17 +67,13 @@ function Login() {
         const errorMessages = {
             400: 'Invalid input or missing fields',
             401: 'Invalid credentials',
+            403: 'Failed to fetch permissions',
             default: 'Login failed. Please try again later.'
         };
 
         const message = errorMessages[status] || errorMessages.default;
         setErrors({ email: message });
         Warning(message);
-    };
-
-    const handleFetchError = (response) => {
-        Error('Failed to fetch permissions');
-        console.error('Permission fetch error:', response);
     };
 
 
