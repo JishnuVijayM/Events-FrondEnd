@@ -19,6 +19,7 @@ import UserRegistation from '../event/userRegistation/UserRegistation';
 import StaticPages from '../settings/staticPages/StaticPages';
 import Faq from '../settings/faq/Faq';
 import Notification from '../settings/notification/Notification';
+import AlertModal from '../../components/AlertModal';
 
 const Avatar = () => (
     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -35,14 +36,15 @@ const Index = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const { pathname } = useLocation();
+    const [isSessioExpired, setSessionExpired] = useState(false);
+
 
     const handleFetchPermission = async () => {
         const roleId = localStorage.getItem('id')
         const token = localStorage.getItem('token')
 
         if (!roleId || !token) {
-            alert('session expired, login again')
-            navigate('/')
+            setSessionExpired(true)
             return
         }
 
@@ -261,13 +263,25 @@ const Index = () => {
     };
 
     const handleLogout = () => {
-        alert('logout');
+        navigate('/')
+        localStorage.clear()
     };
 
 
 
     return (
         <>
+
+            <AlertModal
+                label="Your session has expired"
+                message="Please log in again...!"
+                isOpen={isSessioExpired}
+                onConfirm={() => {
+                    navigate('/')
+                    setSessionExpired(false);
+                }}
+            />
+
             {/* Navbar */}
             <nav className="fixed top-0 z-50 w-full bg-gradient-to-r from-white to-primary border-b border-black">
                 <div className="px-3 py-3 lg:px-5 lg:pl-3">
@@ -378,7 +392,7 @@ const Index = () => {
                     </ul>
 
                     <ul className="mt-auto">
-                        <li className="hover:bg-gray-200 rounded-lg text-white">
+                        <li className="hover:scale-80 hover:shadow-lg hover:opacity-90 transition-transform duration-300 rounded-lg text-white">
                             <button
                                 onClick={handleLogout}
                                 className="w-full flex items-center p-2 text-md font-medium rounded-lg group-hover:text-gray-500"

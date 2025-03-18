@@ -13,12 +13,30 @@ axiosInstance.interceptors.request.use(
         // Ensure that headers are merged properly
         config.headers = {
             ...config.headers,
-            'Content-Type': config.headers['Content-Type'] || 'application/json', 
+            'Content-Type': config.headers['Content-Type'] || 'application/json',
         };
         return config;
     },
     (error) => {
         console.error('Request error:', error);
+        return Promise.reject(error);
+    }
+);
+
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response) {
+            const { errorCode } = error.response.data;
+
+            if (errorCode === 1003) {
+                console.warn('Invalid or expired token detected.');
+
+                localStorage.clear()
+
+                return Promise.reject(new Error('Session expired. Please log in again.'));
+            }
+        }
         return Promise.reject(error);
     }
 );
